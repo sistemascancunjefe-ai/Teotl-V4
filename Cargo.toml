@@ -1,0 +1,18 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/teotl_core",
+    "crates/teotl_engine",
+    "crates/teotl_game",
+    "crates/teotl_wasm",
+]
+
+[workspace.package]
+version = "4.0.0"
+edition = "2021"
+authors = ["Teotl V4 Team"]
+license = "MIT"
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

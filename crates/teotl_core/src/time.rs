@@ -61,7 +61,17 @@ impl TimeAccumulator {
         ticks
     }
 
-    /// Get interpolation alpha for rendering
+    /// Get interpolation alpha for rendering.
+    ///
+    /// This value represents how far we are between the previous and the next
+    /// fixed tick, in the range `[0.0, 1.0]`. It is intended to be used by
+    /// renderers to interpolate state between simulation steps for smoother
+    /// visuals in fixed-timestep engines.
+    ///
+    /// Note: As of the current phase, this method is not yet exposed through
+    /// the WASM API and is not wired into the engine's public interface. It is
+    /// kept here intentionally as a future-facing feature (e.g., Phase 2) for
+    /// interpolation-based rendering.
     pub fn alpha(&self) -> f32 {
         self.accumulator / self.config.fixed_dt
     }

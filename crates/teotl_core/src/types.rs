@@ -55,3 +55,40 @@ impl Vec2 {
 
     pub const ZERO: Self = Self::new(0.0, 0.0);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_nightmare_level_intensity() {
+        assert_eq!(NightmareLevel::Dormant.intensity(), 0.0);
+        assert_eq!(NightmareLevel::Awakening.intensity(), 0.25);
+        assert_eq!(NightmareLevel::Dread.intensity(), 0.5);
+        assert_eq!(NightmareLevel::Terror.intensity(), 0.75);
+        assert_eq!(NightmareLevel::Abyss.intensity(), 1.0);
+    }
+
+    #[test]
+    fn test_nightmare_level_from_level() {
+        assert_eq!(NightmareLevel::from_level(0), NightmareLevel::Dormant);
+        assert_eq!(NightmareLevel::from_level(1), NightmareLevel::Awakening);
+        assert_eq!(NightmareLevel::from_level(2), NightmareLevel::Dread);
+        assert_eq!(NightmareLevel::from_level(3), NightmareLevel::Terror);
+        assert_eq!(NightmareLevel::from_level(4), NightmareLevel::Abyss);
+        // Values above 4 are clamped to Abyss
+        assert_eq!(NightmareLevel::from_level(99), NightmareLevel::Abyss);
+    }
+
+    #[test]
+    fn test_nightmare_level_name() {
+        assert_eq!(NightmareLevel::Dormant.name(), "DORMANT");
+        assert_eq!(NightmareLevel::Abyss.name(), "ABYSS");
+    }
+
+    #[test]
+    fn test_vec2_zero() {
+        assert_eq!(Vec2::ZERO.x, 0.0);
+        assert_eq!(Vec2::ZERO.y, 0.0);
+    }
+}

@@ -76,3 +76,56 @@ impl Default for Engine {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use teotl_core::NightmareLevel;
+
+    #[test]
+    fn test_engine_initial_state() {
+        let mut engine = Engine::new();
+        engine.init();
+        assert_eq!(engine.state.nightmare_level, NightmareLevel::Dormant);
+        assert_eq!(engine.state.tick_count, 0);
+        assert!(!engine.state.paused);
+    }
+
+    #[test]
+    fn test_engine_tick_increments_count() {
+        let mut engine = Engine::new();
+        engine.init();
+        engine.tick(1.0 / 60.0);
+        assert_eq!(engine.state.tick_count, 1);
+    }
+
+    #[test]
+    fn test_engine_set_nightmare_level_emits_event() {
+        let mut engine = Engine::new();
+        engine.init();
+        engine.set_nightmare_level(NightmareLevel::Terror);
+        assert_eq!(engine.state.nightmare_level, NightmareLevel::Terror);
+        // An event should have been queued
+        assert!(!engine.events.is_empty());
+    }
+
+    #[test]
+    fn test_engine_set_nightmare_level_no_duplicate_event() {
+        let mut engine = Engine::new();
+        engine.init();
+        engine.set_nightmare_level(NightmareLevel::Dread);
+        let count_after_first = engine.events.len();
+        // Setting the same level again should not emit another event
+        engine.set_nightmare_level(NightmareLevel::Dread);
+        assert_eq!(engine.events.len(), count_after_first);
+    }
+
+    #[test]
+    fn test_engine_get_intensity() {
+        let mut engine = Engine::new();
+        engine.init();
+        assert_eq!(engine.get_intensity(), 0.0);
+        engine.set_nightmare_level(NightmareLevel::Abyss);
+        assert_eq!(engine.get_intensity(), 1.0);
+    }
+}

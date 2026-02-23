@@ -22,7 +22,7 @@ Work is divided into seven autonomous workstreams that can progress in parallel 
 
 **Tasks**
 - [ ] Set up Cargo workspace + `wasm-pack` build pipeline
-- [ ] Implement fixed-timestep loop with `requestAnimationFrame` hook
+- [ ] Implement fixed-timestep accumulator / game-step logic driven by host `dt`
 - [ ] Design and expose `wasm-bindgen` API: `init()`, `tick(dt)`, `send_input(event)`
 - [ ] Implement ECS core (entity registry, component storage, system dispatch)
 - [ ] Add collision detection and basic physics

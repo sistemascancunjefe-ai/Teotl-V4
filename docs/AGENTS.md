@@ -194,7 +194,7 @@ Work is divided into seven autonomous workstreams that can progress in parallel 
 ```
 Agent 1 (Engine) ──▶ Agent 2 (Web Host)  — WASM API contract
 Agent 1 (Engine) ──▶ Agent 3 (Horror UI) — horror-level events
-Agent 1 (Engine) ──▶ Agent 4 (Atmosphere)— horror-level events
+Agent 1 (Engine) ──▶ Agent 4 (Atmosphere) — horror-level events
 Agent 5 (Pipeline)──▶ Agent 1,2,3,4      — asset manifest + paths
 Agent 6 (Lore)   ──▶ Agent 5 (Pipeline) — content data schemas
 Agent 7 (Art)    ──▶ Agent 5 (Pipeline) — art assets

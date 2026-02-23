@@ -141,9 +141,11 @@ export class WasmEngineHost {
 
   /**
    * Get total ticks
+   *
+   * @returns {bigint} Total number of ticks since the engine started.
    */
   getTickCount() {
-    if (!this.isReady()) return 0;
+    if (!this.isReady()) return 0n;
     return this._wasm.get_tick_count();
   }
 

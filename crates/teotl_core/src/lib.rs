@@ -1,6 +1,6 @@
 //! teotl_core — Core data types, math utilities, and shared primitives.
 //!
-//! This crate is `no_std`-friendly and contains no platform-specific code.
+//! This crate contains no platform-specific code and serves as a shared foundation.
 //! All other crates depend on this one.
 
 /// Placeholder version check — replace with real core types.

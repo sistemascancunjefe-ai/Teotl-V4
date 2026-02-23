@@ -333,12 +333,12 @@ The intensity automatically flows from Rust → TS through:
 A vertical slice is complete when:
 
 - [x] WASM module builds without errors
-- [x] TypeScript can load and initialize engine
+- [ ] TypeScript can load and initialize engine
 - [x] Game loop runs at stable 60 FPS
-- [x] Input events reach Rust and affect state
-- [x] Audio events flow back to TypeScript
-- [x] Render commands flow back to TypeScript
-- [x] Nightmare level changes propagate correctly
+- [ ] Input events reach Rust and affect state
+- [ ] Audio events flow back to TypeScript
+- [ ] Render commands flow back to TypeScript
+- [ ] Nightmare level changes propagate correctly
 - [ ] At least one game mechanic implemented end-to-end
 - [ ] Performance meets targets (60 FPS on mid-range hardware)
 

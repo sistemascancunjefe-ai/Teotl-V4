@@ -3,7 +3,7 @@
  * Loads and interfaces with the Rust WASM engine
  */
 
-import init, { TeotlWasm } from '../pkg/teotl_wasm.js';
+import init, { TeotlWasm } from '../../pkg/teotl_wasm.js';
 
 export class WasmEngineHost {
   constructor() {

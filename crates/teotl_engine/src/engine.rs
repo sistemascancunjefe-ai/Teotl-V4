@@ -24,7 +24,8 @@ impl Engine {
 
     /// Initialize engine
     pub fn init(&mut self) {
-        self.state.nightmare_level = NightmareLevel::Dormant;
+        // Reinitialize engine state to its default configuration.
+        self.state = EngineState::new();
     }
 
     /// Process one frame tick

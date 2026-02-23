@@ -24,7 +24,16 @@ impl Scheduler {
 
     /// Schedule a task to run at specific time
     pub fn schedule(&mut self, name: String, execute_at: f32) {
-        self.tasks.push_back(ScheduledTask { execute_at, name });
+        let new_task = ScheduledTask { execute_at, name };
+
+        // Insert the new task so that `tasks` remains sorted by `execute_at` (earliest first).
+        let insert_pos = self
+            .tasks
+            .iter()
+            .position(|task| task.execute_at > new_task.execute_at)
+            .unwrap_or(self.tasks.len());
+
+        self.tasks.insert(insert_pos, new_task);
     }
 
     /// Update scheduler and execute due tasks

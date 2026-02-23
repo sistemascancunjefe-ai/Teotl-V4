@@ -3,7 +3,7 @@ Teotl V4 Nightmare Mode with psychological horror UI and atmospheric engine
 
 ## Overview
 
-**Teotl V4 — Nightmare Mode** is a browser-based psychological horror videogame built with **Rust/WASM + TypeScript**. The core engine runs as a WebAssembly module compiled from Rust, while the browser host (canvas, input, audio) is driven by TypeScript. Nightmare Mode delivers a dynamic psychological horror experience through a reactive UI state machine and a procedural atmospheric engine.
+**Teotl V4 — Nightmare Mode** is currently a browser-based psychological horror videogame prototype implemented as a no-build JavaScript app driven by `src/main.js`. The target architecture is **Rust/WASM + TypeScript**, where the core engine will run as a WebAssembly module compiled from Rust and the browser host (canvas, input, audio) will be driven by TypeScript. Nightmare Mode aims to deliver a dynamic psychological horror experience through a reactive UI state machine and a procedural atmospheric engine.
 
 ## Parallel Agent Workstreams
 

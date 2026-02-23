@@ -172,7 +172,7 @@ Work is divided into seven autonomous workstreams that can progress in parallel 
 | File / Path | Description |
 |---|---|
 | `docs/art/ART_BIBLE.md` | Art bible (style guide, mood boards, references) |
-| `docs/art/COLOR_PALETTE.md` | Canonical colour palette |
+| `docs/art/COLOUR_PALETTE.md` | Canonical colour palette |
 | `docs/art/TYPOGRAPHY.md` | Font choices and usage rules |
 | `assets/splasharts/` | Splash-art files directory |
 | `assets/ui-icons/` | UI icon set |

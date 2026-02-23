@@ -24,6 +24,14 @@ pub struct TimeAccumulator {
     pub config: TimeConfig,
     pub accumulator: f32,
     pub total_time: f32,
+    /// Number of fixed ticks that have been produced by this accumulator instance.
+    ///
+    /// Note: `EngineState` also maintains its own `tick_count`, which typically tracks
+    /// a higher‑level notion of engine ticks. This field is **local** to the
+    /// `TimeAccumulator` and is not guaranteed to stay in sync with
+    /// `EngineState::tick_count`. Code that needs a single canonical tick value
+    /// should consistently use one source (usually `EngineState`) instead of
+    /// combining or comparing these counters.
     pub tick_count: u64,
 }
 

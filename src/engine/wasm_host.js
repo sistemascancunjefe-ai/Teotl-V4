@@ -53,7 +53,7 @@ export class WasmEngineHost {
       return;
     }
 
-    const dt = Math.min((timestamp - this._lastTime) / 1000, 0.1); // Max 100ms
+    const dt = Math.min((timestamp - this._lastTime) / 1000, 0.25); // Max 250ms
     this._lastTime = timestamp;
 
     // Update engine

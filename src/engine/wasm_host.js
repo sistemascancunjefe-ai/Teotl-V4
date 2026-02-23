@@ -22,7 +22,6 @@ export class WasmEngineHost {
 
       // Create engine instance
       this._wasm = new TeotlWasm();
-      this._wasm.init();
 
       this._initialized = true;
       console.log('[WasmEngineHost] Engine initialized successfully');

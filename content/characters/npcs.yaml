@@ -1,0 +1,29 @@
+# characters — NPC placeholder data
+
+characters:
+  - id: the_hollow_priest
+    name: "El Sacerdote Hueco"
+    archetype: antagonist
+    description: >
+      Once a keeper of the Teotl rites, now a vessel for something older.
+      Speaks in fragmented liturgy and backwards Spanish. Never blinks.
+    nightmare_level: 3
+    dialogue_tree: hollow_priest_main
+
+  - id: the_weeping_child
+    name: "La Niña que Llora"
+    archetype: ambiguous
+    description: >
+      Found in every location yet never where you expect her. Her face is
+      obscured by long black hair. She cries without sound.
+    nightmare_level: 1
+    dialogue_tree: weeping_child_main
+
+  - id: mirror_self
+    name: "El Otro Tú"
+    archetype: reflection
+    description: >
+      Your own reflection, behaving differently. Sometimes helpful.
+      Never trustworthy.
+    nightmare_level: 4
+    dialogue_tree: mirror_self_main

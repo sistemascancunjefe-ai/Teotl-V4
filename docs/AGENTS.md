@@ -1,6 +1,7 @@
 # Teotl V4 — Parallel Agent Workstreams
 
-This document defines the parallel agent roles and responsibilities for **Teotl V4 — Nightmare Mode**, a browser-based psychological horror videogame built with Rust/WASM + TypeScript.
+This document defines the parallel agent roles and responsibilities for **Teotl V4 — Nightmare Mode**, a browser-based psychological horror videogame targeting a Rust/WASM + TypeScript architecture.
+The current repository codebase is a JavaScript prototype (`src/main.js`); this document describes the planned workstreams for migrating to the Rust/WASM + TypeScript stack.
 
 Work is divided into seven autonomous workstreams that can progress in parallel and synchronise through clearly defined interfaces (file paths, API contracts, asset manifests).
 

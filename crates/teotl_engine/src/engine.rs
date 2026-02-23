@@ -6,10 +6,10 @@ use crate::scheduler::Scheduler;
 
 /// Main engine
 pub struct Engine {
-    pub state: EngineState,
-    pub time: TimeAccumulator,
-    pub scheduler: Scheduler,
-    pub events: EventQueue,
+    pub(crate) state: EngineState,
+    pub(crate) time: TimeAccumulator,
+    pub(crate) scheduler: Scheduler,
+    pub(crate) events: EventQueue,
 }
 
 impl Engine {

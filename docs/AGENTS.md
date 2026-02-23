@@ -15,7 +15,7 @@ Work is divided into seven autonomous workstreams that can progress in parallel 
 | File / Path | Description |
 |---|---|
 | `crate/engine/src/lib.rs` | Root library entry-point |
-| `crate/engine/src/loop.rs` | Fixed-timestep game loop |
+| `crate/engine/src/game_loop.rs` | Fixed-timestep game loop |
 | `crate/engine/src/ecs/` | Entity-Component-System modules |
 | `crate/engine/src/api.rs` | `wasm-bindgen` exported API (init, tick, input events) |
 | `pkg/` | Compiled `.wasm` + JS glue (build output, not committed) |

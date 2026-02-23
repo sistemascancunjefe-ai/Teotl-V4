@@ -17,6 +17,9 @@ teotl_game   = { path = "../teotl_game" }
 wasm-bindgen = { workspace = true }
 js-sys       = { workspace = true }
 web-sys      = { workspace = true }
+serde        = { workspace = true }
+serde_json   = { workspace = true }
+console_error_panic_hook = "0.1"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

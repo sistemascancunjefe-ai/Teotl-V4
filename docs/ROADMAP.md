@@ -1,7 +1,7 @@
 # Teotl V4 — Roadmap
 
 This is the phased delivery roadmap for **Teotl V4 — Nightmare Mode**.  
-Each phase has a goal, a checklist of deliverables, and a mapping to the [parallel agent workstreams](AGENTS.md).
+Each phase has a goal, a checklist of deliverables, and a mapping to the [parallel agent workstreams](AGENTS.md). Note: the current repository is still a JS-only prototype; establishing and migrating to the Rust/WASM + TypeScript + WASM skeleton is part of Phases 0–1, not an existing baseline.
 
 ---
 

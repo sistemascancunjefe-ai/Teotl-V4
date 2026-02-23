@@ -176,7 +176,7 @@ Work is divided into seven autonomous workstreams that can progress in parallel 
 | `docs/art/TYPOGRAPHY.md` | Font choices and usage rules |
 | `assets/splasharts/` | Splash-art files directory |
 | `assets/ui-icons/` | UI icon set |
-| `tools/optimize-images.ts` | Image optimisation / export script |
+| `tools/optimise-images.ts` | Image optimisation / export script |
 
 **Tasks**
 - [ ] Write art bible: visual style, mood, pixel-art vs. illustrated direction

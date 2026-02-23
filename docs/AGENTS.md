@@ -107,7 +107,7 @@ Work is divided into seven autonomous workstreams that can progress in parallel 
 - [ ] Implement adaptive music system (stems, transitions)
 - [ ] Build dynamic lighting controller (flicker, colour temperature, intensity)
 - [ ] Implement fog/particle overlay driven by atmosphere state
-- [ ] Expose events API consumed by the WASM engine (`on_horror_level_change`)
+- [ ] Consume horror-level / zone events emitted by the WASM engine (e.g. `on_horror_level_change`) and expose derived atmosphere outputs to the host/UI as needed
 - [ ] Document state machine in `docs/design/ATMOSPHERE_STATES.md`
 
 ---

@@ -58,6 +58,21 @@ impl Engine {
         self.state.nightmare_level.intensity()
     }
 
+    /// Get current nightmare level
+    pub fn nightmare_level(&self) -> NightmareLevel {
+        self.state.nightmare_level
+    }
+
+    /// Get total fixed-timestep tick count
+    pub fn tick_count(&self) -> u64 {
+        self.state.tick_count
+    }
+
+    /// Get total simulated time in seconds
+    pub fn total_time(&self) -> f32 {
+        self.time.total_time
+    }
+
     /// Set nightmare level
     pub fn set_nightmare_level(&mut self, level: NightmareLevel) {
         if self.state.nightmare_level != level {
@@ -127,5 +142,17 @@ mod tests {
         assert_eq!(engine.get_intensity(), 0.0);
         engine.set_nightmare_level(NightmareLevel::Abyss);
         assert_eq!(engine.get_intensity(), 1.0);
+    }
+
+    #[test]
+    fn test_engine_getters() {
+        let mut engine = Engine::new();
+        engine.init();
+        assert_eq!(engine.nightmare_level(), NightmareLevel::Dormant);
+        assert_eq!(engine.tick_count(), 0);
+        assert_eq!(engine.total_time(), 0.0);
+        engine.tick(1.0 / 60.0);
+        assert_eq!(engine.tick_count(), 1);
+        assert!((engine.total_time() - 1.0 / 60.0).abs() < 1e-6);
     }
 }

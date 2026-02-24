@@ -23,11 +23,8 @@ impl TeotlWasm {
     pub fn new() -> Self {
         set_panic_hook();
 
-        let mut engine = Engine::new();
-        engine.init();
-
         Self {
-            engine,
+            engine: Engine::new(),
             systems: GameSystems::new(),
             audio_events: Vec::new(),
             render_commands: Vec::new(),
@@ -99,25 +96,25 @@ impl TeotlWasm {
     /// Get current nightmare level (0-4)
     #[wasm_bindgen]
     pub fn get_nightmare_level(&self) -> u8 {
-        self.engine.state.nightmare_level as u8
+        self.engine.nightmare_level() as u8
     }
 
     /// Get nightmare level name
     #[wasm_bindgen]
     pub fn get_nightmare_name(&self) -> String {
-        self.engine.state.nightmare_level.name().to_string()
+        self.engine.nightmare_level().name().to_string()
     }
 
     /// Get total tick count
     #[wasm_bindgen]
     pub fn get_tick_count(&self) -> u64 {
-        self.engine.state.tick_count
+        self.engine.tick_count()
     }
 
     /// Get total time elapsed
     #[wasm_bindgen]
     pub fn get_total_time(&self) -> f32 {
-        self.engine.time.total_time
+        self.engine.total_time()
     }
 }
 
@@ -129,17 +126,16 @@ impl TeotlWasm {
         // Example: clear screen
         self.render_commands.push(RenderCommand {
             cmd_type: "clear".to_string(),
-            params: r#"{"color": [0, 0, 0, 1]}"#.to_string(),
+            params: serde_json::json!({"color": [0, 0, 0, 1]}).to_string(),
         });
 
         // Example: render based on intensity
         let intensity = self.engine.get_intensity();
         if intensity > 0.0 {
-            let params = format!(
-                r#"{{"intensity": {}, "level": {}}}"#,
-                intensity,
-                self.engine.state.nightmare_level as u8
-            );
+            let params = serde_json::json!({
+                "intensity": intensity,
+                "level": self.engine.nightmare_level() as u8
+            }).to_string();
             self.render_commands.push(RenderCommand {
                 cmd_type: "nightmare_overlay".to_string(),
                 params,
@@ -161,27 +157,21 @@ impl TeotlWasm {
                 Event::Atmosphere(atmo) => {
                     match atmo {
                         AtmosphereEvent::Stinger { name, volume } => {
-                            let params = format!(
-                                r#"{{"name": "{}", "volume": {}}}"#,
-                                name, volume
-                            );
+                            let params = serde_json::json!({"name": name, "volume": volume}).to_string();
                             self.audio_events.push(AudioEvent {
                                 event_type: "stinger".to_string(),
                                 params,
                             });
                         }
                         AtmosphereEvent::MoodChange { tension } => {
-                            let params = format!(r#"{{"tension": {}}}"#, tension);
+                            let params = serde_json::json!({"tension": tension}).to_string();
                             self.audio_events.push(AudioEvent {
                                 event_type: "mood".to_string(),
                                 params,
                             });
                         }
                         AtmosphereEvent::AmbientLayer { name, intensity } => {
-                            let params = format!(
-                                r#"{{"name": "{}", "intensity": {}}}"#,
-                                name, intensity
-                            );
+                            let params = serde_json::json!({"name": name, "intensity": intensity}).to_string();
                             self.audio_events.push(AudioEvent {
                                 event_type: "ambient".to_string(),
                                 params,
@@ -191,7 +181,7 @@ impl TeotlWasm {
                 }
                 Event::Gameplay(teotl_core::GameplayEvent::NightmareLevelChanged { level }) => {
                     let intensity = NightmareLevel::from_level(level).intensity();
-                    let params = format!(r#"{{"tension": {}}}"#, intensity);
+                    let params = serde_json::json!({"tension": intensity}).to_string();
                     self.audio_events.push(AudioEvent {
                         event_type: "mood".to_string(),
                         params,

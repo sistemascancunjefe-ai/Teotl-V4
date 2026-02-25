@@ -189,19 +189,13 @@ impl TeotlWasm {
                         }
                     }
                 }
-                Event::Gameplay(gameplay) => {
-                    // Convert gameplay events to audio if needed
-                    match gameplay {
-                        teotl_core::GameplayEvent::NightmareLevelChanged { level } => {
-                            let intensity = NightmareLevel::from_level(level).intensity();
-                            let params = format!(r#"{{"tension": {}}}"#, intensity);
-                            self.audio_events.push(AudioEvent {
-                                event_type: "mood".to_string(),
-                                params,
-                            });
-                        }
-                        _ => {}
-                    }
+                Event::Gameplay(teotl_core::GameplayEvent::NightmareLevelChanged { level }) => {
+                    let intensity = NightmareLevel::from_level(level).intensity();
+                    let params = format!(r#"{{"tension": {}}}"#, intensity);
+                    self.audio_events.push(AudioEvent {
+                        event_type: "mood".to_string(),
+                        params,
+                    });
                 }
                 _ => {}
             }

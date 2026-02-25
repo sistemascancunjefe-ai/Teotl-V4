@@ -82,3 +82,51 @@ impl Default for TimeAccumulator {
         Self::new(TimeConfig::default())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_time_accumulator_ticks() {
+        let mut acc = TimeAccumulator::default();
+        // One frame at 60fps: ~16.667ms → exactly 1 tick
+        let ticks = acc.add_time(1.0 / 60.0);
+        assert_eq!(ticks, 1);
+    }
+
+    #[test]
+    fn test_time_accumulator_multiple_ticks() {
+        let mut acc = TimeAccumulator::default();
+        // Add 3 separate frames to avoid floating-point precision issues
+        acc.add_time(1.0 / 60.0);
+        acc.add_time(1.0 / 60.0);
+        acc.add_time(1.0 / 60.0);
+        assert_eq!(acc.tick_count, 3);
+    }
+
+    #[test]
+    fn test_time_accumulator_max_dt_clamp() {
+        let mut acc = TimeAccumulator::default();
+        // Large spike should be clamped to max_dt (0.25s → 15 ticks)
+        let ticks = acc.add_time(10.0);
+        assert!(ticks <= 15);
+    }
+
+    #[test]
+    fn test_time_accumulator_total_time() {
+        let mut acc = TimeAccumulator::default();
+        acc.add_time(1.0 / 60.0);
+        acc.add_time(1.0 / 60.0);
+        // Each tick advances total_time by fixed_dt (1/60)
+        let expected = 2.0 / 60.0;
+        assert!((acc.total_time - expected).abs() < 1e-5);
+    }
+
+    #[test]
+    fn test_time_accumulator_alpha() {
+        let acc = TimeAccumulator::default();
+        // No time added: alpha should be 0
+        assert_eq!(acc.alpha(), 0.0);
+    }
+}

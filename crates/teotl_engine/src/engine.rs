@@ -62,6 +62,21 @@ impl Engine {
         self.state.nightmare_level.intensity()
     }
 
+    /// Get current nightmare level
+    pub fn nightmare_level(&self) -> NightmareLevel {
+        self.state.nightmare_level
+    }
+
+    /// Get total fixed-tick count
+    pub fn tick_count(&self) -> u64 {
+        self.state.tick_count
+    }
+
+    /// Get total elapsed simulation time in seconds
+    pub fn total_time(&self) -> f32 {
+        self.time.total_time
+    }
+
     /// Set nightmare level
     pub fn set_nightmare_level(&mut self, level: NightmareLevel) {
         if self.state.nightmare_level != level {

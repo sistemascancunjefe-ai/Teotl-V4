@@ -95,11 +95,11 @@ The Rust engine exposes a stable API through `wasm-bindgen`:
 ### Core Methods
 
 #### `init()`
-Initialize the engine. Must be called once after WASM module loads.
+Initialize the engine. This is invoked internally by the `TeotlWasm` constructor, so typical hosts do not need to call it explicitly. If you construct the engine in a non-standard way, ensure `init()` is called exactly once after the WASM module loads.
 
 ```javascript
+// Engine is initialized by the constructor; no explicit init() call required.
 const wasm = new TeotlWasm();
-wasm.init();
 ```
 
 #### `tick(dt: number)`

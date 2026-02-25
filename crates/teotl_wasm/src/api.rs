@@ -138,7 +138,7 @@ impl TeotlWasm {
             let params = format!(
                 r#"{{"intensity": {}, "level": {}}}"#,
                 intensity,
-                self.engine.get_nightmare_level() as u8
+                self.engine.state.nightmare_level as u8
             );
             self.render_commands.push(RenderCommand {
                 cmd_type: "nightmare_overlay".to_string(),

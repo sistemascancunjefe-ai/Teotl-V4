@@ -17,7 +17,7 @@ Development is organised into **seven parallel workstreams** (agents) that can p
 | 4 | Atmospheric Engine — audio/ambient/lighting/fog state machine |
 | 5 | Content Pipeline/Tools — asset packing, validation, manifests |
 | 6 | Lore/Mundo/Personajes — world bible, characters, timeline, content data |
-| 7 | Arte/Splasharts/Identidad Visual — art bible, splash-art pipeline |
+| 7 | Arte/Splasharts/Identidad Visual — art bible, splash art pipeline |
 
 See **[docs/AGENTS.md](docs/AGENTS.md)** for full role definitions, deliverables, and task lists.
 

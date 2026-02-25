@@ -117,7 +117,7 @@ impl TeotlWasm {
     /// Get total time elapsed
     #[wasm_bindgen]
     pub fn get_total_time(&self) -> f32 {
-        self.engine.time.total_time
+        self.engine.get_total_time()
     }
 }
 

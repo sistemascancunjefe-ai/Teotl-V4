@@ -75,6 +75,10 @@ impl Mul<Vec2> for f32 {
     }
 }
 
+    fn mul(self, vec: Vec2) -> Vec2 {
+        Vec2::new(vec.x * self, vec.y * self)
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;

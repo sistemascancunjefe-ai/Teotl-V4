@@ -17,7 +17,145 @@
   <div id="vignette" class="vignette" aria-hidden="true"></div>
 
   <!-- Main application container -->
-  <div id="app"></div>
+  <div id="app" class="app">
+
+    <!-- Splash / Title Screen -->
+    <section id="screen-title" class="screen screen--active" data-screen="title">
+      <div class="title-container">
+        <div class="title-eyebrow glitch-text" data-text="SISTEMA TEOTL">SISTEMA TEOTL</div>
+        <h1 class="title-logo glitch-text" data-text="TEOTL V4">TEOTL V4</h1>
+        <div class="title-subtitle">
+          <span class="subtitle-line flicker">MODO PESADILLA</span>
+          <span class="subtitle-line">— NIGHTMARE MODE —</span>
+        </div>
+        <div class="title-tagline corrupted-text">Motor Atmosférico · Horror Psicológico</div>
+        <nav class="title-menu" role="navigation" aria-label="Menú principal">
+          <button class="menu-btn menu-btn--primary" data-action="start">
+            <span class="btn-text">INICIAR</span>
+            <span class="btn-glow" aria-hidden="true"></span>
+          </button>
+          <button class="menu-btn" data-action="nightmare">
+            <span class="btn-text">MODO PESADILLA</span>
+            <span class="btn-glow" aria-hidden="true"></span>
+          </button>
+          <button class="menu-btn" data-action="settings">
+            <span class="btn-text">CONFIGURACIÓN</span>
+            <span class="btn-glow" aria-hidden="true"></span>
+          </button>
+        </nav>
+        <div class="title-version">v4.0.0</div>
+      </div>
+    </section>
+
+    <!-- Main Game / Experience Screen -->
+    <section id="screen-main" class="screen" data-screen="main">
+      <header class="hud" role="banner">
+        <div class="hud-left">
+          <div class="hud-label">SISTEMA</div>
+          <div class="hud-value" id="hud-system">TEOTL</div>
+        </div>
+        <div class="hud-center">
+          <div class="hud-label">MODO</div>
+          <div class="hud-value flicker" id="hud-mode">PESADILLA</div>
+        </div>
+        <div class="hud-right">
+          <div class="hud-label">NIVEL</div>
+          <div class="hud-value" id="hud-level">I</div>
+        </div>
+      </header>
+
+      <main class="experience-area" id="experience-area" role="main">
+        <div class="atmosphere-text" id="atmosphere-text" aria-live="polite">
+          <!-- Dynamic text injected by horror-ui.ts -->
+        </div>
+        <div class="entity" id="entity" aria-hidden="true">
+          <div class="entity-core"></div>
+          <div class="entity-ring entity-ring--1"></div>
+          <div class="entity-ring entity-ring--2"></div>
+          <div class="entity-ring entity-ring--3"></div>
+        </div>
+      </main>
+
+      <footer class="controls" role="contentinfo">
+        <button class="ctrl-btn" data-action="toggle-nightmare" aria-pressed="false">
+          PESADILLA
+        </button>
+        <button class="ctrl-btn" data-action="toggle-audio" aria-pressed="false">
+          AUDIO
+        </button>
+        <button class="ctrl-btn" data-action="back-title">
+          SALIR
+        </button>
+      </footer>
+    </section>
+
+    <!-- Settings Screen -->
+    <section id="screen-settings" class="screen" data-screen="settings">
+      <div class="settings-container">
+        <h2 class="settings-title glitch-text" data-text="CONFIGURACIÓN">CONFIGURACIÓN</h2>
+        <form class="settings-form" id="settings-form" novalidate>
+
+          <fieldset class="settings-group">
+            <legend class="settings-group-label">MOTOR ATMOSFÉRICO</legend>
+            <label class="settings-item">
+              <span class="settings-item-label">Partículas</span>
+              <input type="range" id="setting-particles" min="0" max="300" value="150" aria-label="Número de partículas">
+              <span class="settings-item-value" id="setting-particles-val">150</span>
+            </label>
+            <label class="settings-item">
+              <span class="settings-item-label">Velocidad de niebla</span>
+              <input type="range" id="setting-fog-speed" min="1" max="10" value="3" aria-label="Velocidad de niebla">
+              <span class="settings-item-value" id="setting-fog-speed-val">3</span>
+            </label>
+            <label class="settings-item">
+              <span class="settings-item-label">Opacidad atmosférica</span>
+              <input type="range" id="setting-atm-opacity" min="0" max="100" value="70" aria-label="Opacidad atmosférica">
+              <span class="settings-item-value" id="setting-atm-opacity-val">70</span>
+            </label>
+          </fieldset>
+
+          <fieldset class="settings-group">
+            <legend class="settings-group-label">UI HORROR PSICOLÓGICO</legend>
+            <label class="settings-item">
+              <span class="settings-item-label">Intensidad glitch</span>
+              <input type="range" id="setting-glitch" min="0" max="10" value="5" aria-label="Intensidad de glitch">
+              <span class="settings-item-value" id="setting-glitch-val">5</span>
+            </label>
+            <label class="settings-item settings-item--toggle">
+              <span class="settings-item-label">Efecto parpadeo</span>
+              <input type="checkbox" id="setting-flicker" checked aria-label="Efecto parpadeo">
+              <span class="toggle-indicator" aria-hidden="true"></span>
+            </label>
+            <label class="settings-item settings-item--toggle">
+              <span class="settings-item-label">Texto corrupto</span>
+              <input type="checkbox" id="setting-corrupt-text" checked aria-label="Texto corrupto">
+              <span class="toggle-indicator" aria-hidden="true"></span>
+            </label>
+          </fieldset>
+
+          <fieldset class="settings-group">
+            <legend class="settings-group-label">AUDIO</legend>
+            <label class="settings-item">
+              <span class="settings-item-label">Volumen maestro</span>
+              <input type="range" id="setting-master-vol" min="0" max="100" value="60" aria-label="Volumen maestro">
+              <span class="settings-item-value" id="setting-master-vol-val">60</span>
+            </label>
+            <label class="settings-item settings-item--toggle">
+              <span class="settings-item-label">Efectos de horror</span>
+              <input type="checkbox" id="setting-horror-sfx" checked aria-label="Efectos de horror">
+              <span class="toggle-indicator" aria-hidden="true"></span>
+            </label>
+          </fieldset>
+
+        </form>
+        <div class="settings-actions">
+          <button class="menu-btn" data-action="save-settings">GUARDAR</button>
+          <button class="menu-btn" data-action="back-title">VOLVER</button>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /#app -->
 
   <script type="module" src="/src/main.ts"></script>
 </body>

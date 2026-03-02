@@ -1,11 +1,11 @@
 //! Main WASM API exposed to TypeScript
 
-use wasm_bindgen::prelude::*;
-use teotl_core::{Event, InputEvent, NightmareLevel, AtmosphereEvent};
+use crate::commands::{AudioEvent, RenderCommand};
+use crate::utils::set_panic_hook;
+use teotl_core::{AtmosphereEvent, Event, InputEvent, NightmareLevel};
 use teotl_engine::Engine;
 use teotl_game::GameSystems;
-use crate::utils::set_panic_hook;
-use crate::commands::{RenderCommand, AudioEvent};
+use wasm_bindgen::prelude::*;
 
 /// Main Teotl WASM instance
 #[wasm_bindgen]
@@ -103,27 +103,25 @@ impl TeotlWasm {
     /// Get current nightmare level (0-4)
     #[wasm_bindgen]
     pub fn get_nightmare_level(&self) -> u8 {
-        self.engine.state.nightmare_level as u8
+        self.engine.nightmare_level() as u8
     }
 
     /// Get nightmare level name
     #[wasm_bindgen]
     pub fn get_nightmare_name(&self) -> String {
-        self.engine.state.nightmare_level.name().to_string()
+        self.engine.nightmare_level().name().to_string()
     }
 
     /// Get total tick count
     #[wasm_bindgen]
     pub fn get_tick_count(&self) -> u64 {
         self.engine.get_tick_count()
-        self.engine.state.tick_count
     }
 
     /// Get total time elapsed
     #[wasm_bindgen]
     pub fn get_total_time(&self) -> f32 {
         self.engine.get_total_time()
-        self.engine.time.total_time
     }
 }
 
@@ -143,8 +141,7 @@ impl TeotlWasm {
         if intensity > 0.0 {
             let params = format!(
                 r#"{{"intensity": {}, "level": {}}}"#,
-                intensity,
-                self.engine.state.nightmare_level as u8
+                intensity, self.engine.state.nightmare_level as u8
             );
             self.render_commands.push(RenderCommand {
                 cmd_type: "nightmare_overlay".to_string(),
@@ -164,37 +161,30 @@ impl TeotlWasm {
 
         for event in events {
             match event {
-                Event::Atmosphere(atmo) => {
-                    match atmo {
-                        AtmosphereEvent::Stinger { name, volume } => {
-                            let params = format!(
-                                r#"{{"name": "{}", "volume": {}}}"#,
-                                name, volume
-                            );
-                            self.audio_events.push(AudioEvent {
-                                event_type: "stinger".to_string(),
-                                params,
-                            });
-                        }
-                        AtmosphereEvent::MoodChange { tension } => {
-                            let params = format!(r#"{{"tension": {}}}"#, tension);
-                            self.audio_events.push(AudioEvent {
-                                event_type: "mood".to_string(),
-                                params,
-                            });
-                        }
-                        AtmosphereEvent::AmbientLayer { name, intensity } => {
-                            let params = format!(
-                                r#"{{"name": "{}", "intensity": {}}}"#,
-                                name, intensity
-                            );
-                            self.audio_events.push(AudioEvent {
-                                event_type: "ambient".to_string(),
-                                params,
-                            });
-                        }
+                Event::Atmosphere(atmo) => match atmo {
+                    AtmosphereEvent::Stinger { name, volume } => {
+                        let params = format!(r#"{{"name": "{}", "volume": {}}}"#, name, volume);
+                        self.audio_events.push(AudioEvent {
+                            event_type: "stinger".to_string(),
+                            params,
+                        });
                     }
-                }
+                    AtmosphereEvent::MoodChange { tension } => {
+                        let params = format!(r#"{{"tension": {}}}"#, tension);
+                        self.audio_events.push(AudioEvent {
+                            event_type: "mood".to_string(),
+                            params,
+                        });
+                    }
+                    AtmosphereEvent::AmbientLayer { name, intensity } => {
+                        let params =
+                            format!(r#"{{"name": "{}", "intensity": {}}}"#, name, intensity);
+                        self.audio_events.push(AudioEvent {
+                            event_type: "ambient".to_string(),
+                            params,
+                        });
+                    }
+                },
                 Event::Gameplay(teotl_core::GameplayEvent::NightmareLevelChanged { level }) => {
                     let intensity = NightmareLevel::from_level(level).intensity();
                     let params = format!(r#"{{"tension": {}}}"#, intensity);

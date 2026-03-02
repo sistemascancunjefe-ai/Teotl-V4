@@ -6,8 +6,8 @@
 /// A single world location node.
 #[derive(Debug, Clone)]
 pub struct Location {
-    pub id:          String,
-    pub name:        String,
+    pub id: String,
+    pub name: String,
     pub description: String,
     pub connections: Vec<String>,
 }

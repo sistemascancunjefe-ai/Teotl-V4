@@ -63,3 +63,31 @@ impl Default for Scheduler {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn tasks_execute_in_time_order() {
+        let mut scheduler = Scheduler::new();
+        scheduler.schedule("late".to_string(), 2.0);
+        scheduler.schedule("early".to_string(), 1.0);
+
+        // Should be ordered by execute_at regardless of insertion order
+        assert_eq!(scheduler.tasks.front().unwrap().name, "early");
+    }
+
+    #[test]
+    fn update_runs_due_tasks() {
+        let mut scheduler = Scheduler::new();
+        scheduler.schedule("first".into(), 0.5);
+        scheduler.schedule("second".into(), 1.5);
+
+        let executed = scheduler.update(1.0);
+        assert_eq!(executed, vec!["first".to_string()]);
+
+        let remaining = scheduler.update(2.0);
+        assert_eq!(remaining, vec!["second".to_string()]);
+    }
+}

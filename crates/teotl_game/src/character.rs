@@ -5,8 +5,8 @@
 /// A character or NPC archetype.
 #[derive(Debug, Clone)]
 pub struct Character {
-    pub id:          String,
-    pub name:        String,
-    pub archetype:   String,
+    pub id: String,
+    pub name: String,
+    pub archetype: String,
     pub description: String,
 }

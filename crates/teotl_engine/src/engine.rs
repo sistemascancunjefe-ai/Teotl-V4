@@ -1,8 +1,8 @@
 //! Main engine coordinator
 
-use teotl_core::{Event, EventQueue, TimeAccumulator, NightmareLevel};
-use crate::state::EngineState;
 use crate::scheduler::Scheduler;
+use crate::state::EngineState;
+use teotl_core::{Event, EventQueue, NightmareLevel, TimeAccumulator};
 
 /// Main engine
 pub struct Engine {
@@ -64,16 +64,29 @@ impl Engine {
         self.state.nightmare_level.intensity()
     }
 
+    /// Get current nightmare level
+    pub fn nightmare_level(&self) -> NightmareLevel {
+        self.state.nightmare_level
+    }
+
     /// Set nightmare level
     pub fn set_nightmare_level(&mut self, level: NightmareLevel) {
         if self.state.nightmare_level != level {
             self.state.nightmare_level = level;
             self.events.push(Event::Gameplay(
-                teotl_core::GameplayEvent::NightmareLevelChanged {
-                    level: level as u8,
-                }
+                teotl_core::GameplayEvent::NightmareLevelChanged { level: level as u8 },
             ));
         }
+    }
+
+    /// Get total tick count
+    pub fn get_tick_count(&self) -> u64 {
+        self.state.tick_count
+    }
+
+    /// Get total time elapsed
+    pub fn get_total_time(&self) -> f32 {
+        self.time.total_time
     }
 }
 
@@ -86,7 +99,7 @@ impl Default for Engine {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use teotl_core::NightmareLevel;
+    use teotl_core::{Event as CoreEvent, InputEvent, NightmareLevel, Vec2};
 
     #[test]
     fn test_engine_initial_state() {
@@ -133,5 +146,33 @@ mod tests {
         assert_eq!(engine.get_intensity(), 0.0);
         engine.set_nightmare_level(NightmareLevel::Abyss);
         assert_eq!(engine.get_intensity(), 1.0);
+    }
+
+    #[test]
+    fn test_engine_tick_and_time_getters() {
+        let mut engine = Engine::new();
+        engine.init();
+        engine.tick(1.0 / 60.0);
+        assert_eq!(engine.get_tick_count(), 1);
+        assert!((engine.get_total_time() - (1.0 / 60.0)).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_engine_handles_input_events() {
+        let mut engine = Engine::new();
+        engine.init();
+        let move_event = CoreEvent::Input(InputEvent::MouseMove {
+            position: Vec2::new(1.0, 2.0),
+        });
+        engine.handle_input(move_event);
+        let drained = engine.events.drain();
+        assert_eq!(drained.len(), 1);
+        match &drained[0] {
+            CoreEvent::Input(InputEvent::MouseMove { position }) => {
+                assert_eq!(position.x, 1.0);
+                assert_eq!(position.y, 2.0);
+            }
+            _ => panic!("expected mouse move input event"),
+        }
     }
 }

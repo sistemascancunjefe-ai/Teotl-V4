@@ -32,3 +32,23 @@ impl Default for EngineState {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn reset_restores_defaults() {
+        let mut state = EngineState {
+            nightmare_level: NightmareLevel::Abyss,
+            tick_count: 42,
+            paused: true,
+        };
+
+        state.reset();
+
+        assert_eq!(state.nightmare_level, NightmareLevel::Dormant);
+        assert_eq!(state.tick_count, 0);
+        assert!(!state.paused);
+    }
+}

@@ -1,7 +1,7 @@
 //! Event system for input, gameplay, atmosphere, and UI
 
-use serde::{Deserialize, Serialize};
 use crate::Vec2;
+use serde::{Deserialize, Serialize};
 
 /// Input event types
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -79,5 +79,40 @@ impl EventQueue {
     #[allow(dead_code)]
     pub fn len(&self) -> usize {
         self.events.len()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn event_queue_push_and_drain() {
+        let mut queue = EventQueue::new();
+        queue.push(Event::Input(InputEvent::KeyDown { key: "W".into() }));
+        queue.push(Event::Gameplay(GameplayEvent::PlayerDamaged {
+            amount: 5.0,
+        }));
+
+        assert!(!queue.is_empty());
+        assert_eq!(queue.len(), 2);
+
+        let drained = queue.drain();
+        assert!(queue.is_empty());
+        assert_eq!(drained.len(), 2);
+        matches!(drained[0], Event::Input(InputEvent::KeyDown { .. }));
+        matches!(
+            drained[1],
+            Event::Gameplay(GameplayEvent::PlayerDamaged { .. })
+        );
+    }
+
+    #[test]
+    fn event_queue_clear_resets() {
+        let mut queue = EventQueue::new();
+        queue.push(Event::UI(UIEvent::ShowMessage { text: "hi".into() }));
+        queue.clear();
+        assert!(queue.is_empty());
+        assert_eq!(queue.len(), 0);
     }
 }

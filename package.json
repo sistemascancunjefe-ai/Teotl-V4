@@ -6,8 +6,11 @@
   "scripts": {
     "start": "npx serve . -p 3000",
     "dev": "npx serve . -p 3000 --no-clipboard",
-    "test": "npx jest --testPathPattern=src/__tests__"
+    "test": "vitest run"
   },
   "keywords": ["horror", "atmospheric", "nightmare", "game", "ui"],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "vitest": "^1.6.0"
+  }
 }

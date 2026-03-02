@@ -292,7 +292,6 @@ name = "teotl_wasm"
 version = "4.0.0"
 dependencies = [
  "console_error_panic_hook",
- "js-sys",
  "serde",
  "serde_json",
  "teotl_core",

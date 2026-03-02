@@ -405,5 +405,90 @@ Nightmare mode escalates automatically every `escalationInterval` ms
 
 > See [ARCHITECTURE](ARCHITECTURE.md) for the Web Audio graph overview.
 
-Planned implementation: layered ambient OGG loops cross-faded dynamically
-based on nightmare level. Stingers are one-shot AudioBufferSourceNode playbacks.
+Implemented in `src/engine/audio.js`.  The engine generates all sound
+procedurally via the Web Audio API — no external audio files are required.
+
+### Reactive Audio Hooks (Nightmare Level)
+
+`AudioEngine` reacts to the `NightmareEngine` level (0 DORMANT → 4 ABYSS)
+through a single method:
+
+```javascript
+audioEngine.setNightmareLevel(level); // 0–4
+```
+
+When the level changes the engine performs a **crossfade** (default 2 s) between
+the outgoing ambient layer and the incoming one.  Each level has a distinct
+configuration:
+
+| Level | Name      | Drone stack                  | Drone gain | Noise gain | Filter cutoff |
+|-------|-----------|------------------------------|------------|------------|---------------|
+| 0     | DORMANT   | 27.5 Hz, 41.2 Hz             | 0.015      | 0.008      | 80 Hz         |
+| 1     | AWAKENING | + 55.0 Hz                    | 0.020      | 0.012      | 100 Hz        |
+| 2     | DREAD     | + 73.4 Hz                    | 0.028      | 0.017      | 130 Hz        |
+| 3     | TERROR    | + 82.4 Hz                    | 0.036      | 0.023      | 160 Hz        |
+| 4     | ABYSS     | + 110.0 Hz                   | 0.045      | 0.030      | 200 Hz        |
+
+#### Crossfade Mechanism
+
+```
+current oscillators ──gain ramp→ 0 ──stop after CROSSFADE_TIME──►
+new oscillators     ──gain ramp→ target over CROSSFADE_TIME──►
+noise layer         ──replaced immediately, gain ramps in──►
+```
+
+`CROSSFADE_TIME` is exported as a module constant (`2.0` seconds by default).
+
+#### Integration Example
+
+```javascript
+// In main.js — wired through NightmareEngine's 'levelchange' event:
+nightmare.on('levelchange', ({ level }) => {
+  audioEngine.setNightmareLevel(level);
+});
+nightmare.on('deactivate', () => {
+  audioEngine.setNightmareLevel(0);
+});
+```
+
+### Stingers and Cooldowns
+
+One-shot audio events triggered by gameplay:
+
+```javascript
+audioEngine.playStinger('heartbeat'); // plays only if cooldown has elapsed
+```
+
+| Type        | Description                          | Cooldown  |
+|-------------|--------------------------------------|-----------|
+| `click`     | Short transient pop (UI feedback)    | 500 ms    |
+| `heartbeat` | Double-thump (level escalation)      | 3 000 ms  |
+| `whisper`   | Band-passed noise burst (DREAD+)     | 8 000 ms  |
+| `screech`   | Descending sawtooth screech (ABYSS)  | 15 000 ms |
+
+Each stinger type tracks the timestamp of its last play (`_stingerLastPlayed`
+Map).  `playStinger()` silently returns if the cooldown has not elapsed, so
+callers do not need to manage timing themselves.
+
+#### Suggested Trigger Points
+
+| Event                              | Stinger      |
+|------------------------------------|--------------|
+| Any button / UI interaction        | `click`      |
+| Nightmare level escalation         | `heartbeat`  |
+| Level ≥ 2 and player is idle       | `whisper`    |
+| Level ≥ 3 jump-scare               | `screech`    |
+
+### NightmareEngine Connection
+
+`main.js` wires the two engines together in `_applyNightmareLevel`:
+
+```javascript
+// src/main.js — _applyNightmareLevel(level, name)
+this._audio.setNightmareLevel(level);   // crossfade ambient
+// … on escalation:
+this._audio.playStinger('heartbeat');   // announce level change
+```
+
+The legacy `setNightmareMode(active)` method is still available and maps
+`active=true` → level 1, `active=false` → level 0.

@@ -1,0 +1,26 @@
+/* Main CSS file */
+@import './horror.css';
+@import './nightmare.css';
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+  color: #ccc;
+  font-family: sans-serif;
+  overflow: hidden;
+}
+
+#atmospheric-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+#app {
+  position: relative;
+  z-index: 10;
+}

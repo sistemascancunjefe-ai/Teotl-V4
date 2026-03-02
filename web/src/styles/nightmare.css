@@ -1,0 +1,9 @@
+/* Nightmare effects */
+:root {
+  --nightmare-intensity: 0;
+}
+
+body[data-nightmare-level="1"] { --nightmare-intensity: 0.2; }
+body[data-nightmare-level="2"] { --nightmare-intensity: 0.5; }
+body[data-nightmare-level="3"] { --nightmare-intensity: 0.8; }
+body[data-nightmare-level="4"] { --nightmare-intensity: 1.0; }

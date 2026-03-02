@@ -35,6 +35,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Create WASM mock
+        run: |
+          mkdir -p src/wasm
+          echo 'export default async function init() {}; export class TeotlWasm { init() {} }' > src/wasm/teotl_wasm.js
+          echo 'declare module "../wasm/teotl_wasm" { export default function init(): Promise<any>; export class TeotlWasm { init(): void; } }' > src/wasm/teotl_wasm.d.ts
+
       - name: Type-check
         run: npm run typecheck
 

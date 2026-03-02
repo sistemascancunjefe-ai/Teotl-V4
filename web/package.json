@@ -1,0 +1,17 @@
+{
+  "name": "teotl-v4-web",
+  "version": "4.0.0",
+  "description": "Teotl V4 — Nightmare Mode · Browser host (TypeScript + Vite)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11"
+  }
+}

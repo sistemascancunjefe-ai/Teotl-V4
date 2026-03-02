@@ -1,0 +1,33 @@
+# quests — placeholder quest definitions
+
+quests:
+  - id: find_the_entrance
+    name: "Encuentra la Entrada"
+    type: main
+    description: >
+      The ritual requires a threshold. Find the liminal entrance before the
+      nightmare reaches level 3.
+    objectives:
+      - id: obj_reach_entrance
+        description: "Reach the Liminal Entrance"
+        location: liminal_entrance
+        complete: false
+    rewards:
+      - type: unlock_location
+        target: altar_room
+
+  - id: silence_the_echoes
+    name: "Silencia los Ecos"
+    type: side
+    description: >
+      Something in the corridor keeps repeating a name. Find out whose name
+      it is — and why it stopped being spoken aloud.
+    objectives:
+      - id: obj_enter_corridor
+        description: "Enter the Corridor of Echoes"
+        location: corridor_of_echoes
+        complete: false
+      - id: obj_find_source
+        description: "Locate the source of the echoes"
+        location: chamber_of_faces
+        complete: false

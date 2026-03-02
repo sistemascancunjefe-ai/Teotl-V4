@@ -4,6 +4,13 @@ version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
+name        = "teotl_wasm"
+description = "WebAssembly bindings for Teotl V4 — exposes engine and game APIs to the TypeScript host"
+version.workspace     = true
+edition.workspace     = true
+authors.workspace     = true
+license.workspace     = true
+repository.workspace  = true
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -23,3 +30,16 @@ web-sys = { version = "0.3", features = ["console"] }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.45"
+[dependencies]
+teotl_core   = { path = "../teotl_core" }
+teotl_engine = { path = "../teotl_engine" }
+teotl_game   = { path = "../teotl_game" }
+wasm-bindgen = { workspace = true }
+js-sys       = { workspace = true }
+web-sys      = { workspace = true }
+serde        = { workspace = true }
+serde_json   = { workspace = true }
+console_error_panic_hook = "0.1"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"

@@ -1,0 +1,37 @@
+# world — locations placeholder
+# Each entry defines a node in the world graph.
+
+locations:
+  - id: liminal_entrance
+    name: "La Entrada Liminal"
+    description: >
+      A threshold between the living world and the nightmare realm.
+      Flickering light, distant whispers, the smell of wet stone.
+    connections:
+      - corridor_of_echoes
+      - altar_room
+
+  - id: corridor_of_echoes
+    name: "El Corredor de los Ecos"
+    description: >
+      A long, narrow passage whose walls seem to breathe. Every sound
+      returns distorted, slightly too late.
+    connections:
+      - liminal_entrance
+      - chamber_of_faces
+
+  - id: altar_room
+    name: "La Sala del Altar"
+    description: >
+      Obsidian slabs arranged in concentric circles. Something was
+      worshipped here — or sacrificed.
+    connections:
+      - liminal_entrance
+
+  - id: chamber_of_faces
+    name: "La Cámara de los Rostros"
+    description: >
+      Stone masks cover every surface. None of them are the same face twice.
+      They all seem to be watching.
+    connections:
+      - corridor_of_echoes

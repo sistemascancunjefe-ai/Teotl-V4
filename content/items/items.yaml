@@ -1,0 +1,28 @@
+# items — placeholder item registry
+
+items:
+  - id: obsidian_shard
+    name: "Fragmento de Obsidiana"
+    type: key_item
+    description: >
+      Cold to the touch even in warm rooms. Reflects light that isn't there.
+    uses:
+      - unlock_altar
+      - ritual_offering
+
+  - id: torn_photograph
+    name: "Fotografía Rasgada"
+    type: lore_item
+    description: >
+      Half of a family photograph. The other half shows people whose faces
+      have been scratched out.
+    lore_id: photo_backstory
+
+  - id: fear_candle
+    name: "Vela del Miedo"
+    type: consumable
+    description: >
+      Burns with a blue flame. Reveals hidden text on walls, but draws
+      attention from whatever lurks in the dark.
+    uses:
+      - reveal_hidden

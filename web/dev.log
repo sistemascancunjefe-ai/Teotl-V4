@@ -1,0 +1,13 @@
+
+> teotl-v4-web@4.0.0 dev
+> vite
+
+
+  VITE v5.4.21  ready in 334 ms
+
+  ➜  Local:   http://localhost:3001/
+  ➜  Network: use --host to expose
+8:28:32 PM [vite] page reload src/engine/wasm-bridge.ts
+8:28:33 PM [vite] page reload src/engine/wasm-bridge.ts
+8:29:19 PM [vite] page reload src/ui/horror-ui.ts
+8:31:41 PM [vite] page reload src/wasm/teotl_wasm.js

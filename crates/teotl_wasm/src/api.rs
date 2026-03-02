@@ -38,6 +38,7 @@ impl TeotlWasm {
     #[wasm_bindgen]
     pub fn init(&mut self) {
         self.engine.init();
+        web_sys::console::log_1(&"[TeotlWasm] Engine initialized".into());
         #[cfg(target_arch = "wasm32")]
         {
             web_sys::console::log_1(&"[TeotlWasm] Engine initialized".into());
@@ -114,12 +115,14 @@ impl TeotlWasm {
     /// Get total tick count
     #[wasm_bindgen]
     pub fn get_tick_count(&self) -> u64 {
+        self.engine.get_tick_count()
         self.engine.state.tick_count
     }
 
     /// Get total time elapsed
     #[wasm_bindgen]
     pub fn get_total_time(&self) -> f32 {
+        self.engine.get_total_time()
         self.engine.time.total_time
     }
 }

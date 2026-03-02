@@ -27,6 +27,7 @@ pub struct TimeAccumulator {
     /// Number of fixed ticks that have been produced by this accumulator instance.
     ///
     /// Note: `EngineState` also maintains its own `tick_count`, which typically tracks
+    /// a higher‑level notion of engine ticks. This field is **local** to the
     /// a higher-level notion of engine ticks. This field is **local** to the
     /// `TimeAccumulator` and is not guaranteed to stay in sync with
     /// `EngineState::tick_count`. Code that needs a single canonical tick value

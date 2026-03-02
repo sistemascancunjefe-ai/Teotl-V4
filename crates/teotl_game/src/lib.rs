@@ -1,3 +1,7 @@
+//! TEOTL V4 — Game Logic
+//!
+//! Game rules, systems, and gameplay mechanics (stubs for now).
+
 //! teotl_game — Game logic, world state, character systems, and quest engine.
 //!
 //! Responsibilities:

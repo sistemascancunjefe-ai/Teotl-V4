@@ -24,6 +24,8 @@ impl Engine {
 
     /// Initialize engine
     pub fn init(&mut self) {
+        // Reinitialize engine state to its default configuration.
+        self.state = EngineState::new();
         // Reinitialize engine state and runtime subsystems to their default configuration.
         self.state = EngineState::new();
         self.time = TimeAccumulator::default();

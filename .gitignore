@@ -1,3 +1,20 @@
+# Rust
+/target/
+Cargo.lock
+
+# WASM build output
+/pkg/
+*.wasm
+
+# Node
+node_modules/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 # Node / web
 web/node_modules/
 web/dist/
@@ -21,6 +38,9 @@ assets/runtime/**/*.mp3
 .DS_Store
 Thumbs.db
 
+# Build artifacts
+dist/
+build/
 # Editor
 .vscode/settings.json
 .idea/

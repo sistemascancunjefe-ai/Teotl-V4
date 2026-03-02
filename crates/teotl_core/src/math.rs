@@ -70,6 +70,11 @@ impl Mul<f32> for Vec2 {
 
 impl Mul<Vec2> for f32 {
     type Output = Vec2;
+    fn mul(self, v: Vec2) -> Vec2 {
+        Vec2::new(self * v.x, self * v.y)
+    }
+}
+
     fn mul(self, vec: Vec2) -> Vec2 {
         Vec2::new(vec.x * self, vec.y * self)
     }
@@ -123,6 +128,14 @@ mod tests {
     fn test_vec2_mul() {
         let a = Vec2::new(2.0, 3.0);
         let c = a * 2.0;
+        assert_eq!(c.x, 4.0);
+        assert_eq!(c.y, 6.0);
+    }
+
+    #[test]
+    fn test_f32_mul_vec2() {
+        let a = Vec2::new(2.0, 3.0);
+        let c = 2.0 * a;
         assert_eq!(c.x, 4.0);
         assert_eq!(c.y, 6.0);
     }

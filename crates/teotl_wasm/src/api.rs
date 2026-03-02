@@ -99,25 +99,25 @@ impl TeotlWasm {
     /// Get current nightmare level (0-4)
     #[wasm_bindgen]
     pub fn get_nightmare_level(&self) -> u8 {
-        self.engine.state.nightmare_level as u8
+        self.engine.nightmare_level() as u8
     }
 
     /// Get nightmare level name
     #[wasm_bindgen]
     pub fn get_nightmare_name(&self) -> String {
-        self.engine.state.nightmare_level.name().to_string()
+        self.engine.nightmare_level().name().to_string()
     }
 
     /// Get total tick count
     #[wasm_bindgen]
     pub fn get_tick_count(&self) -> u64 {
-        self.engine.state.tick_count
+        self.engine.tick_count()
     }
 
     /// Get total time elapsed
     #[wasm_bindgen]
     pub fn get_total_time(&self) -> f32 {
-        self.engine.time.total_time
+        self.engine.total_time()
     }
 }
 
@@ -138,7 +138,7 @@ impl TeotlWasm {
             let params = format!(
                 r#"{{"intensity": {}, "level": {}}}"#,
                 intensity,
-                self.engine.state.nightmare_level as u8
+                self.engine.nightmare_level() as u8
             );
             self.render_commands.push(RenderCommand {
                 cmd_type: "nightmare_overlay".to_string(),

@@ -1,49 +1,73 @@
-# Roadmap — Teotl V4 · Nightmare Mode
+# Roadmap detallado con checkpoints por fase
 
-> **Status:** Draft — subject to change.
+## Fase 0 — Arranque (Setup)
+**Meta:** poder trabajar ordenado desde el día 1.
 
-## Phase 0 — Architecture & Scaffold *(current)*
+### Checkpoints
+- [x] README inicial (qué es, cómo correr, variables, estructura)
+- [x] Estructura de carpetas + convenciones
+- [x] Gestión de configuración/secretos definida (aunque sea local)
+- [x] Licencia, CONTRIBUTING, CODEOWNERS (si aplica)
 
-- [x] Monorepo structure: `web/`, `crates/`, `assets/`, `content/`, `docs/`
-- [x] TypeScript scaffold with Vite
-- [x] Rust workspace with placeholder crates
-- [x] Placeholder docs and content files
-- [x] CI workflow stubs
+**Finalización de fase:** cualquier dev nuevo puede clonar y correr “algo” o al menos ejecutar pruebas/lint sin dolor.
 
-## Phase 1 — Core Engine
+## Fase 1 — Descubrimiento y Diseño
+**Meta:** claridad del producto y decisiones técnicas base.
 
-- [ ] `teotl_core`: Vec2/Vec3, colour types, RNG seeding
-- [ ] `teotl_engine`: particle system simulation (CPU-side)
-- [ ] `teotl_engine`: nightmare escalation state machine with timed transitions
-- [ ] `teotl_wasm`: compile crates to WASM with `wasm-pack`
-- [ ] `WasmBridge`: load WASM and expose particle tick to TypeScript
-- [ ] `AtmosphericEngine`: connect WASM particle data to Canvas 2D rendering
+### Checkpoints
+- [ ] “Documento 1-página” (visión, usuario, problema, propuesta)
+- [ ] User stories del MVP + criterios de aceptación
+- [ ] Diseño de arquitectura (diagrama simple)
+- [ ] Modelo de datos (si aplica) y contratos (API/eventos)
+- [ ] Riesgos y supuestos (lista corta)
 
-## Phase 2 — Horror UI
+**Finalización:** backlog del MVP priorizado + decisiones clave registradas.
 
-- [ ] Glitch shader / CSS animation system driven by nightmare level
-- [ ] Corrupted-text generator (procedural character substitution)
-- [ ] Flicker engine (randomised CSS transitions)
-- [ ] Atmospheric text cycling with horror phrases from `content/`
+## Fase 2 — Base técnica (infra, calidad, seguridad base)
+**Meta:** construir la pista para despegar sin deuda crítica.
 
-## Phase 3 — Audio
+### Checkpoints
+- [ ] CI mínimo: lint + tests + build
+- [ ] Formateo/linters predecibles
+- [ ] Entornos: dev/staging/prod (aunque prod sea futuro)
+- [ ] Manejo de secretos correcto (no en repo)
+- [ ] Logging estructurado + trazas básicas
+- [ ] Dependabot / actualización de dependencias (opcional)
 
-- [ ] Web Audio API ambient soundscape (layered OGG loops)
-- [ ] Horror stingers (click, heartbeat, whisper, scream)
-- [ ] Nightmare-mode audio cross-fade
-- [ ] Procedural audio intensity scaling with nightmare level
+**Finalización:** cada PR valida automáticamente y el repo no se rompe fácil.
 
-## Phase 4 — Game Content
+## Fase 3 — MVP (camino feliz)
+**Meta:** entregar valor con el mínimo conjunto de features.
 
-- [ ] World graph navigation (locations, transitions)
-- [ ] NPC encounter system
-- [ ] Item pickup / inventory
-- [ ] Quest tracker
+### Checkpoints
+- [ ] Implementar “Happy Path” end-to-end
+- [ ] UI/API funcional mínima (según el tipo de proyecto)
+- [ ] Persistencia (si aplica) con migraciones
+- [ ] Autenticación/autorización mínima (si aplica)
+- [ ] Pruebas: unitarias clave + 1–3 e2e críticas
 
-## Phase 5 — Polish & Release
+**Finalización:** demo estable del MVP, repetible, con datos controlados.
 
-- [ ] Splashart assets (title screen, loading, endings)
-- [ ] Responsive layout for mobile browsers
-- [ ] Accessibility (reduced-motion, audio description)
-- [ ] Performance profiling (WASM vs JS hot-path)
-- [ ] Public demo deployment (GitHub Pages / Vercel)
+## Fase 4 — Beta (robustez)
+**Meta:** hacerlo confiable y operable.
+
+### Checkpoints
+- [ ] Observabilidad: métricas + dashboards + alertas básicas
+- [ ] Pruebas ampliadas (e2e, integración)
+- [ ] Performance básica (profiling + límites)
+- [ ] Seguridad: revisión OWASP básica, permisos, rate limits (si aplica)
+- [ ] Documentación operativa (runbook)
+
+**Finalización:** se puede usar por un grupo pequeño de usuarios sin incendios constantes.
+
+## Fase 5 — Release 1.0
+**Meta:** producción con control.
+
+### Checkpoints
+- [ ] Release notes + versionado
+- [ ] Backups/restore probado (si hay datos)
+- [ ] Plan de despliegue + rollback
+- [ ] SLA/SLO (aunque sea simple)
+- [ ] Soporte y monitoreo post-release
+
+**Finalización:** “1.0” desplegado con monitoreo y procedimiento de operación.

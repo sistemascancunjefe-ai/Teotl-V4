@@ -1,11 +1,10 @@
 [package]
-name = "teotl_wasm"
+name        = "teotl_wasm"
 description = "WebAssembly bindings for Teotl V4 — exposes engine and game APIs to the TypeScript host"
-version.workspace = true
-edition.workspace = true
-authors.workspace = true
-license.workspace = true
-repository.workspace = true
+version.workspace     = true
+edition.workspace     = true
+authors.workspace     = true
+license.workspace     = true
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -14,14 +13,13 @@ crate-type = ["cdylib", "rlib"]
 wasm-opt = false
 
 [dependencies]
-teotl_core = { path = "../teotl_core" }
+teotl_core   = { path = "../teotl_core" }
 teotl_engine = { path = "../teotl_engine" }
-teotl_game = { path = "../teotl_game" }
+teotl_game   = { path = "../teotl_game" }
 wasm-bindgen = { workspace = true }
-js-sys = { workspace = true }
-web-sys = { workspace = true }
-serde = { workspace = true }
-serde_json = { workspace = true }
+web-sys      = { workspace = true }
+serde        = { workspace = true }
+serde_json   = { workspace = true }
 console_error_panic_hook = "0.1"
 
 [dev-dependencies]

@@ -18,6 +18,7 @@ export class AtmosphericEngine {
   private canvas: HTMLCanvasElement;
   private options: Required<AtmosphericOptions>;
   private running = false;
+  private ctx: CanvasRenderingContext2D | null = null;
 
   constructor(canvas: HTMLCanvasElement, options: AtmosphericOptions = {}) {
     this.canvas = canvas;
@@ -29,7 +30,14 @@ export class AtmosphericEngine {
   }
 
   init(): this {
-    // TODO: set up canvas context and initial state
+    this.ctx = this.canvas.getContext('2d');
+
+    if (this.ctx) {
+      this.canvas.width = window.innerWidth;
+      this.canvas.height = window.innerHeight;
+      this.ctx.globalAlpha = this.options.opacity;
+    }
+
     return this;
   }
 

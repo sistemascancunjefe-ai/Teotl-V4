@@ -1,5 +1,6 @@
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
 import { NightmareEngine } from '../engine/nightmare.js';
-import { jest } from '@jest/globals';
+import { vi as jest } from 'vitest';
 
 describe('NightmareEngine', () => {
   let engine;

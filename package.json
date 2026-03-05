@@ -7,17 +7,11 @@
   "scripts": {
     "start": "npx serve . -p 3000",
     "dev": "npx serve . -p 3000 --no-clipboard",
-    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest src/__tests__"
+    "test": "vitest run"
   },
-  "keywords": [
-    "horror",
-    "atmospheric",
-    "nightmare",
-    "game",
-    "ui"
-  ],
+  "keywords": ["horror", "atmospheric", "nightmare", "game", "ui"],
   "license": "MIT",
   "devDependencies": {
-    "puppeteer": "^24.37.5"
+    "vitest": "^1.6.0"
   }
 }

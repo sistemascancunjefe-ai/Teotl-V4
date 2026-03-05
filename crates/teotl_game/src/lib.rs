@@ -12,8 +12,8 @@
 //!
 //! TODO: implement game systems once content data is defined.
 
-pub mod world;
 pub mod character;
 pub mod systems;
+pub mod world;
 
 pub use systems::*;

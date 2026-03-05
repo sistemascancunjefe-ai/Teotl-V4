@@ -1,5 +1,6 @@
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
 import { AudioEngine } from '../engine/audio.js';
-import { jest } from '@jest/globals';
+import { vi as jest } from 'vitest';
 
 // Mock Web Audio API
 class MockAudioBuffer {
@@ -81,7 +82,7 @@ global.window = {
   AudioContext: MockAudioContext,
   webkitAudioContext: MockAudioContext
 };
-global.crypto = mockCrypto;
+Object.defineProperty(global, 'crypto', { value: mockCrypto, writable: true });
 
 describe('AudioEngine', () => {
   let engine;

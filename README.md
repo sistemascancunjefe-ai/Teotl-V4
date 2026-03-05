@@ -29,7 +29,7 @@ See [`docs/ENGINE.md`](docs/ENGINE.md) for detailed architecture documentation.
 cd web && npm install
 
 # Build WASM engine
-wasm-pack build crates/teotl_wasm --target web --out-dir ../../web/src/wasm
+wasm-pack build ../crates/teotl_wasm --target web --out-dir ../../web/src/wasm
 
 # Start dev server
 npm run dev

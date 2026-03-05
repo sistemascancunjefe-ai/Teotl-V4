@@ -1,12 +1,11 @@
- security-fix-audio-prng-7356217374464945795
 import { AudioEngine } from '../engine/audio.js';
 import { jest } from '@jest/globals';
 
 // Mock Web Audio API
 class MockAudioBuffer {
   constructor(options) {
-    this.length = options.length;
-    this.sampleRate = options.sampleRate;
+    this.length = options.length || options; // support both forms
+    this.sampleRate = options.sampleRate || 44100;
     this.data = new Float32Array(this.length);
   }
   getChannelData() {
@@ -80,6 +79,7 @@ const mockCrypto = {
 
 global.window = {
   AudioContext: MockAudioContext,
+  webkitAudioContext: MockAudioContext
 };
 global.crypto = mockCrypto;
 
@@ -88,6 +88,7 @@ describe('AudioEngine', () => {
 
   beforeEach(() => {
     engine = new AudioEngine();
+    engine._nightmareLevel = 1;
   });
 
   afterEach(() => {
@@ -118,123 +119,39 @@ describe('AudioEngine', () => {
     }
   });
   
-import { jest } from '@jest/globals';
-import { AudioEngine } from '../engine/audio.js';
+  test('should cache noise buffer', () => {
+      // Force inject a mock context
+      engine._ctx = new MockAudioContext();
+      engine._masterGain = engine._ctx.createGain();
 
-class MockAudioBuffer {
-    constructor(channels, length, sampleRate) {
-        this.sampleRate = sampleRate;
-        this.length = length;
-        this.numberOfChannels = channels;
-        this.data = new Float32Array(this.length);
-    }
-    getChannelData(channel) {
-        return this.data;
-    }
-}
+      engine.enable();
 
-class MockAudioContext {
-    constructor() {
-        this.sampleRate = 44100;
-        this.currentTime = 0;
-        this.state = 'suspended';
-        this.destination = {};
-    }
-    createBuffer(channels, length, sampleRate) {
-        return new MockAudioBuffer(channels, length, sampleRate);
-    }
-    createGain() {
-        return {
-            gain: {
-                value: 1,
-                setValueAtTime: jest.fn(),
-                linearRampToValueAtTime: jest.fn(),
-                setTargetAtTime: jest.fn(),
-                exponentialRampToValueAtTime: jest.fn()
-            },
-            connect: jest.fn()
-        };
-    }
-    createOscillator() {
-        return {
-            frequency: { value: 440 },
-            type: '',
-            connect: jest.fn(),
-            start: jest.fn(),
-            stop: jest.fn()
-        };
-    }
-    createBufferSource() {
-        return {
-            buffer: null,
-            loop: false,
-            connect: jest.fn(),
-            start: jest.fn(),
-            stop: jest.fn()
-        };
-    }
-    createBiquadFilter() {
-        return {
-            type: '',
-            frequency: { value: 0 },
-            connect: jest.fn()
-        };
-    }
-    resume() {
-        this.state = 'running';
-        return Promise.resolve();
-    }
-    close() {
-        return Promise.resolve();
-    }
-}
+      const firstBuffer = engine._noiseBuffer;
+      expect(firstBuffer).toBeDefined();
 
-global.window = {
-    AudioContext: MockAudioContext,
-    webkitAudioContext: MockAudioContext
-};
+      // Trigger another ambient start (e.g. via nightmare mode toggle)
+      engine.setNightmareMode(true);
 
-describe('AudioEngine', () => {
-    let audioEngine;
+      const secondBuffer = engine._noiseBuffer;
+      expect(secondBuffer).toBe(firstBuffer);
+  });
 
-    beforeEach(() => {
-        audioEngine = new AudioEngine();
-    });
+  test('should recreate noise buffer if sampleRate changes', () => {
+      engine._ctx = new MockAudioContext();
+      engine._masterGain = engine._ctx.createGain();
 
-    test('should cache noise buffer', () => {
-        // Force inject a mock context
-        audioEngine._ctx = new MockAudioContext();
-        audioEngine._masterGain = audioEngine._ctx.createGain();
+      engine.enable();
 
-        audioEngine.enable();
+      const firstBuffer = engine._noiseBuffer;
+      expect(firstBuffer).toBeDefined();
 
-        const firstBuffer = audioEngine._noiseBuffer;
-        expect(firstBuffer).toBeDefined();
+      // Simulate sampleRate change
+      engine._ctx.sampleRate = 48000;
+      // Directly call _startNoiseLayer
+      engine._replaceNoiseLayer({ filterFreq: 1000, noiseGain: 0.5 }, engine._ctx.currentTime, 0.5);
 
-        // Trigger another ambient start (e.g. via nightmare mode toggle)
-        audioEngine.setNightmareMode(true);
-
-        const secondBuffer = audioEngine._noiseBuffer;
-        expect(secondBuffer).toBe(firstBuffer);
-    });
-
-    test('should recreate noise buffer if sampleRate changes', () => {
-        audioEngine._ctx = new MockAudioContext();
-        audioEngine._masterGain = audioEngine._ctx.createGain();
-
-        audioEngine.enable();
-
-        const firstBuffer = audioEngine._noiseBuffer;
-        expect(firstBuffer).toBeDefined();
-
-        // Simulate sampleRate change
-        audioEngine._ctx.sampleRate = 48000;
-        // Directly call _startNoiseLayer
-        audioEngine._startNoiseLayer();
-
-        const secondBuffer = audioEngine._noiseBuffer;
-        expect(secondBuffer).not.toBe(firstBuffer);
-        expect(secondBuffer.sampleRate).toBe(48000);
-    });
- main
+      const secondBuffer = engine._noiseBuffer;
+      expect(secondBuffer).not.toBe(firstBuffer);
+      expect(secondBuffer.sampleRate).toBe(48000);
+  });
 });

@@ -39,10 +39,40 @@ jobs:
         run: |
           mkdir -p src/wasm
           if [ ! -f src/wasm/teotl_wasm.js ]; then
-            echo 'export default async function init() {}; export class TeotlWasm { init() {} }' > src/wasm/teotl_wasm.js
+            cat << 'INNEREOF' > src/wasm/teotl_wasm.js
+export default async function init() {};
+export class TeotlWasm {
+  init() {}
+  tick(dt) {}
+  handle_input(input_json) {}
+  get_audio_events() { return "[]"; }
+  get_render_commands() { return "[]"; }
+  get_intensity() { return 0; }
+  set_nightmare_level(level) {}
+  get_nightmare_level() { return 0; }
+  get_nightmare_name() { return ""; }
+  get_tick_count() { return 0n; }
+  get_total_time() { return 0; }
+}
+INNEREOF
           fi
           if [ ! -f src/wasm/teotl_wasm.d.ts ]; then
-            echo 'declare module "../wasm/teotl_wasm" { export default function init(): Promise<any>; export class TeotlWasm { init(): void; } }' > src/wasm/teotl_wasm.d.ts
+            cat << 'INNEREOF' > src/wasm/teotl_wasm.d.ts
+export default function init(): Promise<any>;
+export class TeotlWasm {
+  init(): void;
+  tick(dt: number): void;
+  handle_input(input_json: string): void;
+  get_audio_events(): string;
+  get_render_commands(): string;
+  get_intensity(): number;
+  set_nightmare_level(level: number): void;
+  get_nightmare_level(): number;
+  get_nightmare_name(): string;
+  get_tick_count(): bigint;
+  get_total_time(): number;
+}
+INNEREOF
           fi
 
       - name: Type-check

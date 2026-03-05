@@ -108,7 +108,6 @@ export class HorrorUI {
     Object.assign(this.options, patch);
   }
 
- horror-ui-implementation-10336436812407817428
   /**
    * Apply a brief screen-flash glitch effect.
    */
@@ -210,16 +209,5 @@ export class HorrorUI {
         ? GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
         : ch;
     }).join('');
-
-  flashGlitch(intensity: number): void {
-    const overlay = document.getElementById('glitch-overlay');
-    if (overlay) {
-      overlay.style.opacity = intensity.toString();
-      overlay.style.display = 'block';
-      setTimeout(() => {
-        overlay.style.opacity = '0';
-        overlay.style.display = 'none';
-      }, 50 + Math.random() * 150);
-    }
   }
 }

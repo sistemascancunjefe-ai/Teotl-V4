@@ -32,8 +32,13 @@ export class AtmosphericEngine {
 
   init(): this {
     this.ctx = this.canvas.getContext('2d');
-    this.resize();
-    window.addEventListener('resize', () => this.resize());
+
+    if (this.ctx) {
+      this.canvas.width = window.innerWidth;
+      this.canvas.height = window.innerHeight;
+      this.ctx.globalAlpha = this.options.opacity;
+    }
+
     return this;
   }
 

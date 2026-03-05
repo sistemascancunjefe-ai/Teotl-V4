@@ -8,6 +8,15 @@
     "dev": "npx serve . -p 3000 --no-clipboard",
     "test": "npx jest --testPathPattern=src/__tests__"
   },
-  "keywords": ["horror", "atmospheric", "nightmare", "game", "ui"],
-  "license": "MIT"
+  "keywords": [
+    "horror",
+    "atmospheric",
+    "nightmare",
+    "game",
+    "ui"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "puppeteer": "^24.37.5"
+  }
 }

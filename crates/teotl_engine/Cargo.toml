@@ -1,24 +1,15 @@
 [package]
 name = "teotl_engine"
+description = "Atmospheric rendering engine and simulation kernels for Teotl V4"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
+repository.workspace = true
 
 [dependencies]
 teotl_core = { path = "../teotl_core" }
-serde.workspace = true
-serde_json.workspace = true
-name        = "teotl_engine"
-description = "Atmospheric rendering engine and simulation kernels for Teotl V4"
-version.workspace     = true
-edition.workspace     = true
-authors.workspace     = true
-license.workspace     = true
-repository.workspace  = true
-
-[dependencies]
-teotl_core = { path = "../teotl_core" }
-serde      = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 
 [dev-dependencies]

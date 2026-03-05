@@ -410,11 +410,11 @@ procedurally via the Web Audio API — no external audio files are required.
 
 ### Reactive Audio Hooks (Nightmare Level)
 
-`AudioEngine` reacts to the `NightmareEngine` level (0 DORMANT → 4 ABYSS)
+`AudioEngine` reacts to the current `NightmareEngine` level (as defined in the NightmareEngine level table above)
 through a single method:
 
 ```javascript
-audioEngine.setNightmareLevel(level); // 0–4
+audioEngine.setNightmareLevel(level); // integer level from the NightmareEngine table
 ```
 
 When the level changes the engine performs a **crossfade** (default 2 s) between

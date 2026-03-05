@@ -40,3 +40,30 @@ impl Default for IdGenerator {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn generator_produces_sequential_ids() {
+        let mut gen = IdGenerator::new();
+        let first = gen.generate();
+        let second = gen.generate();
+        assert!(first.is_valid());
+        assert!(second.is_valid());
+        assert_eq!(first.0 + 1, second.0);
+    }
+
+    #[test]
+    fn invalid_constant_is_not_valid() {
+        assert!(!EntityId::INVALID.is_valid());
+    }
+
+    #[test]
+    fn default_generator_starts_at_one() {
+        let mut gen = IdGenerator::default();
+        let first = gen.generate();
+        assert_eq!(first, EntityId(1));
+    }
+}

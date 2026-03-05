@@ -2,7 +2,11 @@ const fs = require('fs');
 const puppeteer = require('puppeteer');
 
 (async () => {
-  const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
+  const launchOptions = {};
+  if (process.env.CI === 'true' || process.env.CI === '1') {
+    launchOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
+  }
+  const browser = await puppeteer.launch(launchOptions);
   const page = await browser.newPage();
 
   // Wait for load

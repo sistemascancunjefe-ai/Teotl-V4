@@ -14,7 +14,7 @@ export class HorrorUI {
   private container: HTMLElement | null = null;
   private running = false;
   private options: Required<HorrorUIOptions>;
-  private glitchInterval: any = null;
+  private glitchInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(options: HorrorUIOptions = {}) {
     this.options = {

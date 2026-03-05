@@ -74,8 +74,10 @@ class TeotlApp {
     // 6. Initialize settings
     this.initSettings();
 
-    // 7. Create debug overlay
-    this.createDebugOverlay();
+    // 7. Create debug overlay (development only)
+    if (import.meta.env.DEV) {
+      this.createDebugOverlay();
+    }
 
     // 8. Start game loop
     this.startGameLoop();

@@ -5,7 +5,6 @@ version.workspace = true
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
-description = "WebAssembly bindings for Teotl V4 — exposes engine and game APIs to the TypeScript host"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

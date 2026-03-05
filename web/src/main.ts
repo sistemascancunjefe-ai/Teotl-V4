@@ -62,6 +62,12 @@ class TeotlApp {
       this.applyNightmareLevel(0, 'DORMANT');
     });
 
+    // 4b. Apply initial nightmare state so HUD/CSS/engines start consistent
+    if (this.nightmare) {
+      const initialLevel = this.nightmare.level ?? 0;
+      const initialName = NIGHTMARE_LEVEL_NAMES[initialLevel] ?? 'DORMANT';
+      this.applyNightmareLevel(initialLevel, initialName);
+    }
     // 5. Wire up event listeners
     document.addEventListener('click', (e) => this.handleClick(e));
 

@@ -20,7 +20,6 @@ export class AtmosphericEngine {
   private rafId: number | null = null;
   private options: Required<AtmosphericOptions>;
   private running = false;
-  private ctx: CanvasRenderingContext2D | null = null;
 
   constructor(canvas: HTMLCanvasElement, options: AtmosphericOptions = {}) {
     this.canvas = canvas;

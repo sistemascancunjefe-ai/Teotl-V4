@@ -1,7 +1,42 @@
 /**
  * TEOTL V4 — Audio Engine
  * Web Audio API horror sound system with procedural ambient generation.
+ *
+ * Reactive to NightmareEngine levels 0–4:
+ *   0 DORMANT   — near-silence, barely audible sub-bass
+ *   1 AWAKENING — low drone, subtle noise
+ *   2 DREAD     — wider drone stack, thicker noise floor
+ *   3 TERROR    — dissonant overtones, heavy noise
+ *   4 ABYSS     — maximum density, full-range noise
+ *
+ * Crossfade duration between levels: CROSSFADE_TIME seconds.
+ * Each stinger type has an individual cooldown to prevent spamming.
  */
+
+/** Per-level ambient configuration (drone frequencies, gains, low-pass cutoff). */
+const AMBIENT_CONFIGS = [
+  // 0 DORMANT
+  { droneFreqs: [27.5, 41.2],                       droneGain: 0.015, noiseGain: 0.008, filterFreq: 80  },
+  // 1 AWAKENING
+  { droneFreqs: [27.5, 41.2, 55.0],                 droneGain: 0.020, noiseGain: 0.012, filterFreq: 100 },
+  // 2 DREAD
+  { droneFreqs: [27.5, 41.2, 55.0, 73.4],           droneGain: 0.028, noiseGain: 0.017, filterFreq: 130 },
+  // 3 TERROR
+  { droneFreqs: [27.5, 41.2, 55.0, 73.4, 82.4],     droneGain: 0.036, noiseGain: 0.023, filterFreq: 160 },
+  // 4 ABYSS
+  { droneFreqs: [27.5, 41.2, 55.0, 73.4, 82.4, 110.0], droneGain: 0.045, noiseGain: 0.030, filterFreq: 200 },
+];
+
+/** Crossfade duration in seconds when transitioning between nightmare levels. */
+const CROSSFADE_TIME = 2.0;
+
+/** Minimum ms between successive plays of the same stinger type (cooldown). */
+const STINGER_COOLDOWNS = {
+  click:     500,
+  heartbeat: 3000,
+  whisper:   8000,
+  screech:   15000,
+};
 
 export class AudioEngine {
   constructor() {
@@ -12,6 +47,7 @@ export class AudioEngine {
     this._oscillators = [];
     this._noiseSource = null;
     this._nightmareMode = false;
+    this._noiseBuffer = null;
   }
 
   /**
@@ -20,7 +56,7 @@ export class AudioEngine {
   init() {
     if (this._ctx) return this;
     try {
-      this._ctx = new (window.AudioContext || window.webkitAudioContext)();
+      this._ctx = new window.AudioContext();
       this._masterGain = this._ctx.createGain();
       this._masterGain.gain.value = this._volume;
       this._masterGain.connect(this._ctx.destination);
@@ -69,26 +105,47 @@ export class AudioEngine {
     }
   }
 
-  /** Ramp up intensity for nightmare mode. */
-  setNightmareMode(active) {
-    this._nightmareMode = active;
+  /**
+   * Set nightmare intensity level and crossfade to the matching ambient layer.
+   * @param {number} level  0 (DORMANT) – 4 (ABYSS)
+   */
+  setNightmareLevel(level) {
+    const clamped = Math.max(0, Math.min(AMBIENT_CONFIGS.length - 1, Math.round(level)));
+    if (clamped === this._nightmareLevel) return;
+    this._nightmareLevel = clamped;
     if (!this._ctx || !this._enabled) return;
-    this._stopAmbient();
-    this._startAmbient();
+    this._crossfadeAmbient();
   }
 
   /**
-   * Play a short horror stinger (click/pop event).
-   * @param {'click'|'whisper'|'heartbeat'} type
+   * Convenience wrapper kept for backward compatibility.
+   * Maps a boolean to level 1 (active) or 0 (inactive).
+   * @param {boolean} active
+   */
+  setNightmareMode(active) {
+    this.setNightmareLevel(active ? 1 : 0);
+  }
+
+  /**
+   * Play a short horror stinger, subject to per-type cooldown.
+   * @param {'click'|'heartbeat'|'whisper'|'screech'} type
    */
   playStinger(type = 'click') {
     if (!this._ctx || !this._enabled) return;
+    if (!this._stingerReady(type)) return;
+    this._stingerLastPlayed.set(type, Date.now());
     switch (type) {
       case 'click':
         this._playClick();
         break;
       case 'heartbeat':
         this._playHeartbeat();
+        break;
+      case 'whisper':
+        this._playWhisper();
+        break;
+      case 'screech':
+        this._playScreech();
         break;
       default:
         this._playClick();
@@ -106,26 +163,60 @@ export class AudioEngine {
 
   // ---- private ----
 
-  _startAmbient() {
+  /** Returns true when the stinger cooldown has elapsed. */
+  _stingerReady(type) {
+    const cooldown = STINGER_COOLDOWNS[type] ?? 500;
+    const last     = this._stingerLastPlayed.get(type) ?? 0;
+    return (Date.now() - last) >= cooldown;
+  }
+
+  /**
+   * Crossfade from the current ambient layer to the one matching
+   * `_nightmareLevel`.  Running oscillators are faded out and replaced
+   * by fresh ones targeting the new config.
+   */
+  _crossfadeAmbient() {
     if (!this._ctx) return;
     const now = this._ctx.currentTime;
 
-    // Low-frequency ominous drone
-    const droneFreqs = this._nightmareMode
-      ? [27.5, 41.2, 55.0, 82.4]
-      : [27.5, 41.2, 55.0];
+    // Fade out and schedule stop on existing oscillators
+    for (const { osc, gain } of this._oscillators) {
+      gain.gain.setTargetAtTime(0, now, CROSSFADE_TIME / 4);
+      osc.stop(now + CROSSFADE_TIME);
+    }
+    this._oscillators = [];
 
-    for (const freq of droneFreqs) {
+    // Fade out current noise gain before replacing
+    if (this._noiseGainNode) {
+      this._noiseGainNode.gain.setTargetAtTime(0, now, CROSSFADE_TIME / 4);
+    }
+
+    this._buildAmbientLayer(CROSSFADE_TIME);
+  }
+
+  _startAmbient() {
+    if (!this._ctx) return;
+    this._buildAmbientLayer(3.0);
+  }
+
+  /**
+   * Create oscillators and a noise layer for the current `_nightmareLevel`,
+   * ramping each gain up over `rampTime` seconds.
+   * @param {number} rampTime  Fade-in duration in seconds
+   */
+  _buildAmbientLayer(rampTime) {
+    if (!this._ctx) return;
+    const now    = this._ctx.currentTime;
+    const config = AMBIENT_CONFIGS[this._nightmareLevel];
+
+    for (const freq of config.droneFreqs) {
       const osc  = this._ctx.createOscillator();
       const gain = this._ctx.createGain();
 
-      osc.type = 'sawtooth';
+      osc.type            = 'sawtooth';
       osc.frequency.value = freq;
       gain.gain.setValueAtTime(0, now);
-      gain.gain.linearRampToValueAtTime(
-        this._nightmareMode ? 0.04 : 0.02,
-        now + 3
-      );
+      gain.gain.linearRampToValueAtTime(config.droneGain, now + rampTime);
 
       osc.connect(gain);
       gain.connect(this._masterGain);
@@ -133,8 +224,7 @@ export class AudioEngine {
       this._oscillators.push({ osc, gain });
     }
 
-    // Sub-bass rumble
-    this._startNoiseLayer();
+    this._replaceNoiseLayer(config, now, rampTime);
   }
 
   _stopAmbient() {
@@ -147,40 +237,65 @@ export class AudioEngine {
     }
     this._oscillators = [];
 
-    if (this._noiseSource) {
-      try { this._noiseSource.stop(); } catch (err) {
-        if (err.name !== 'InvalidStateError') console.error('[AudioEngine] unexpected error stopping noise source:', err);
-      }
-      this._noiseSource = null;
-    }
+    this._stopNoiseSource();
   }
 
-  _startNoiseLayer() {
-    if (!this._ctx) return;
-    const bufferSize  = this._ctx.sampleRate * 2;
-    const buffer      = this._ctx.createBuffer(1, bufferSize, this._ctx.sampleRate);
-    const data        = buffer.getChannelData(0);
+  /** Stop and discard the looping noise source, if one is running. */
+  _stopNoiseSource() {
+    if (!this._noiseSource) return;
+    try { this._noiseSource.stop(); } catch (err) {
+      if (err.name !== 'InvalidStateError') console.error('[AudioEngine] unexpected error stopping noise source:', err);
+    }
+    this._noiseSource   = null;
+    this._noiseGainNode = null;
+  }
 
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * 0.5;
+  /**
+   * Replace the looping noise layer with one tuned to `config`.
+   * @param {object} config
+   * @param {number} now       AudioContext.currentTime
+   * @param {number} rampTime  Fade-in duration in seconds
+   */
+  _replaceNoiseLayer(config, now, rampTime) {
+    if (!this._ctx) return;
+
+    // Secure random noise generation using Web Crypto API in chunks
+    // (crypto.getRandomValues has a 65536 byte limit per call)
+    const chunkSize = 16384;
+    const randomValues = new Uint32Array(chunkSize);
+
+    for (let i = 0; i < bufferSize; i += chunkSize) {
+      const remaining = bufferSize - i;
+      const currentBatchSize = Math.min(chunkSize, remaining);
+      const batch = currentBatchSize === chunkSize ? randomValues : new Uint32Array(currentBatchSize);
+
+      crypto.getRandomValues(batch);
+
+      for (let j = 0; j < currentBatchSize; j++) {
+        // Map [0, 2^32-1] to [0, 1) then to [-0.5, 0.5)
+        data[i + j] = (batch[j] / 4294967296) - 0.5;
+      }
     }
 
     const source = this._ctx.createBufferSource();
-    source.buffer = buffer;
+    source.buffer = this._noiseBuffer;
     source.loop   = true;
 
     const filter = this._ctx.createBiquadFilter();
     filter.type            = 'lowpass';
-    filter.frequency.value = 80;
+    filter.frequency.value = config.filterFreq;
 
     const gain = this._ctx.createGain();
-    gain.gain.value = this._nightmareMode ? 0.03 : 0.01;
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(config.noiseGain, now + rampTime);
 
     source.connect(filter);
     filter.connect(gain);
     gain.connect(this._masterGain);
     source.start();
-    this._noiseSource = source;
+
+    this._noiseSource   = source;
+    this._noiseGainNode = gain;
   }
 
   _playClick() {
@@ -217,5 +332,55 @@ export class AudioEngine {
       osc.start(now + offset);
       osc.stop(now + offset + 0.4);
     }
+  }
+
+  /** Soft band-limited whisper noise burst — used at DREAD and above. */
+  _playWhisper() {
+    if (!this._ctx) return;
+    const now        = this._ctx.currentTime;
+    const bufferSize = this._ctx.sampleRate * 0.6;
+    const buffer     = this._ctx.createBuffer(1, bufferSize, this._ctx.sampleRate);
+    const data       = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1);
+    }
+
+    const source = this._ctx.createBufferSource();
+    source.buffer = buffer;
+
+    const filter = this._ctx.createBiquadFilter();
+    filter.type            = 'bandpass';
+    filter.frequency.value = 1200;
+    filter.Q.value         = 0.8;
+
+    const gain = this._ctx.createGain();
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.08, now + 0.15);
+    gain.gain.setTargetAtTime(0, now + 0.3, 0.1);
+
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(this._masterGain);
+    source.start(now);
+  }
+
+  /** Short high-pitched screech — reserved for TERROR / ABYSS. */
+  _playScreech() {
+    if (!this._ctx) return;
+    const now  = this._ctx.currentTime;
+    const osc  = this._ctx.createOscillator();
+    const gain = this._ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(800, now);
+    osc.frequency.exponentialRampToValueAtTime(200, now + 0.4);
+
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+
+    osc.connect(gain);
+    gain.connect(this._masterGain);
+    osc.start(now);
+    osc.stop(now + 0.5);
   }
 }

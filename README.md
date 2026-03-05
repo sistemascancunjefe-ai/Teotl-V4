@@ -6,7 +6,8 @@ Teotl V4 Nightmare Mode - A psychological horror browser game with Rust/WASM eng
 
 Hybrid **Rust/WASM + TypeScript** architecture:
 - **Core Engine**: Rust compiled to WebAssembly (fixed timestep, game logic)
-- **Host Runtime**: TypeScript (rendering, audio, input, UI)
+- **Host Runtime**: TypeScript with Vite (rendering, audio, input, UI)
+- **Legacy Host**: JavaScript (original implementation in `/src`)
 
 See [`docs/ENGINE.md`](docs/ENGINE.md) for detailed architecture documentation.
 
@@ -17,11 +18,29 @@ See [`docs/ENGINE.md`](docs/ENGINE.md) for detailed architecture documentation.
 - 🔊 **Procedural Audio**: Web Audio API with tension-driven ambient layers
 - 🌫️ **Atmospheric Engine**: Canvas-based particle and fog system
 - 😱 **Nightmare Mode**: Dynamic intensity system (5 levels: Dormant → Abyss)
+- 📊 **Debug Overlay**: Real-time FPS, delta time, and tension metrics
 
 ## Quick Start
 
+### TypeScript/Vite Version (Recommended)
+
 ```bash
 # Install dependencies
+cd web && npm install
+
+# Build WASM engine
+wasm-pack build ../crates/teotl_wasm --target web --out-dir ../../web/src/wasm
+
+# Start dev server
+npm run dev
+
+# Open http://localhost:3001
+```
+
+### Legacy JavaScript Version
+
+```bash
+# Install dependencies (root level)
 npm install
 
 # Build WASM engine
@@ -42,55 +61,110 @@ npm run dev
 │   ├── teotl_engine/    # Game loop, scheduler
 │   ├── teotl_game/      # Game systems (stubs)
 │   └── teotl_wasm/      # WASM bindings
-├── src/                 # TypeScript/JavaScript
+├── web/                 # TypeScript/Vite host (recommended)
+│   ├── src/
+│   │   ├── engine/      # Atmospheric, audio, nightmare engines
+│   │   ├── ui/          # Horror UI effects
+│   │   ├── wasm/        # WASM build output (generated)
+│   │   └── main.ts      # Application bootstrap
+│   ├── index.html       # Entry point
+│   ├── package.json     # Vite + TypeScript config
+│   └── vite.config.ts   # Vite configuration
+├── src/                 # Legacy JavaScript host
 │   ├── engine/          # Engine hosts (wasm_host, atmospheric, audio, nightmare)
 │   ├── ui/              # Horror UI effects
 │   └── main.js          # Application bootstrap
-├── pkg/                 # WASM build output (generated)
+├── index.html           # Legacy entry point
 ├── docs/                # Documentation
-└── index.html           # Entry point
+└── README.md            # This file
 ```
 
-## Documentation
-
-- [Engine Architecture](docs/ENGINE.md) - Rust/WASM engine design and API
-
 ## Development
+
+### Building the WASM Engine
 
 ```bash
 # Check Rust workspace
 cargo check --workspace
 
-# Build WASM (development)
-wasm-pack build crates/teotl_wasm --target web --out-dir ../../pkg
+# Build WASM (for TypeScript/Vite)
+wasm-pack build crates/teotl_wasm --target web --out-dir ../../web/src/wasm
 
-# Start dev server
+# Build WASM (for legacy JavaScript)
+wasm-pack build crates/teotl_wasm --target web --out-dir ../../pkg
+```
+
+### Running the Development Server
+
+#### TypeScript/Vite (Port 3001)
+```bash
+cd web
 npm run dev
 ```
+
+#### Legacy JavaScript (Port 3000)
+```bash
+npm run dev
+```
+
+### Type Checking
+
+```bash
+cd web
+npm run typecheck
+```
+
+### Building for Production
+
+```bash
+cd web
+npm run build
+```
+
+## Ports
+
+- **TypeScript/Vite**: `http://localhost:3001`
+- **Legacy JavaScript**: `http://localhost:3000`
+
+## Debug Overlay
+
+The TypeScript version includes a real-time debug overlay showing:
+- **FPS**: Frames per second
+- **dt**: Delta time in seconds
+- **Tension**: Current intensity from WASM engine (0.0 - 1.0)
+- **Nightmare**: Current nightmare level and name
+- **WASM Level**: Nightmare level from WASM engine
+- **WASM Time**: Total elapsed time in WASM engine
+- **Screen**: Current active screen
+
+The overlay is visible in the top-right corner during development.
 
 ## Technologies
 
 - **Rust** - Core game engine
 - **WebAssembly** - Compile target
 - **wasm-bindgen** - Rust ↔ JavaScript bindings
-- **TypeScript/JavaScript** - Host runtime
+- **TypeScript** - Type-safe host runtime
+- **Vite** - Fast build tool and dev server
 - **Web Audio API** - Procedural audio
 - **Canvas2D** - Atmospheric rendering
-- **Native ES Modules** - No build step required
+- **ES Modules** - Modern JavaScript module system
 
-## License
+## Roadmap
 
-MIT
-9# Teotl-V4
-Teotl V4 Nightmare Mode with psychological horror UI and atmospheric engine
+Development follows a phased delivery plan:
 
-## Overview
+- **Phase 0** — Repository skeleton & documentation *(in progress)*
+- **Phase 1** — Playable vertical slice *(current)*
+- **Phase 2** — Content expansion (3 zones, full OST)
+- **Phase 3** — Polish, QA & launch
+- **Phase 4** — Post-launch / DLC
 
-**Teotl V4 — Nightmare Mode** is currently a browser-based psychological horror videogame prototype implemented as a no-build JavaScript app driven by `src/main.js`. The target architecture is **Rust/WASM + TypeScript**, where the core engine will run as a WebAssembly module compiled from Rust and the browser host (canvas, input, audio) will be driven by TypeScript. Nightmare Mode aims to deliver a dynamic psychological horror experience through a reactive UI state machine and a procedural atmospheric engine.
+See **[docs/ROADMAP.md](docs/ROADMAP.md)** for the full phased roadmap with per-phase checklists.
 
 ## Parallel Agent Workstreams
 
-Development is organised into **seven parallel workstreams** (agents) that can progress independently and synchronise through well-defined interfaces:
+Development is organized into **seven parallel workstreams** (agents) that can progress independently:
 
 | Agent | Workstream |
 |---|---|
@@ -104,14 +178,6 @@ Development is organised into **seven parallel workstreams** (agents) that can p
 
 See **[docs/AGENTS.md](docs/AGENTS.md)** for full role definitions, deliverables, and task lists.
 
-## Roadmap
+## License
 
-Development follows a phased delivery plan:
-
-- **Phase 0** — Repository skeleton & documentation *(in progress)*
-- **Phase 1** — Playable vertical slice
-- **Phase 2** — Content expansion (3 zones, full OST)
-- **Phase 3** — Polish, QA & launch
-- **Phase 4** — Post-launch / DLC
-
-See **[docs/ROADMAP.md](docs/ROADMAP.md)** for the full phased roadmap with per-phase checklists.
+MIT

@@ -38,7 +38,6 @@ impl TeotlWasm {
     #[wasm_bindgen]
     pub fn init(&mut self) {
         self.engine.init();
-        web_sys::console::log_1(&"[TeotlWasm] Engine initialized".into());
         #[cfg(target_arch = "wasm32")]
         {
             web_sys::console::log_1(&"[TeotlWasm] Engine initialized".into());

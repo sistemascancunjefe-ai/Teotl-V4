@@ -1,5 +1,6 @@
 [package]
-name = "teotl_wasm"
+name        = "teotl_wasm"
+description = "WebAssembly bindings for Teotl V4 — exposes engine and game APIs to the TypeScript host"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true

@@ -302,12 +302,23 @@ class TeotlApp {
         // Process audio events from WASM
         const audioEvents = this.wasm.getAudioEvents();
         for (const event of audioEvents) {
-          // Process audio event
-          if (event.event_type === 'stinger' && this.audio) {
-            const params = event.params as { name?: string };
-            if (params.name) {
-              this.audio.playStinger(params.name as 'click' | 'heartbeat');
+          // Normalize/parse event params so we can safely access fields like `name`.
+          let params: { name?: string; volume?: number } | null = null;
+          const rawParams = (event as any).params;
+
+          if (typeof rawParams === 'string') {
+            try {
+              params = JSON.parse(rawParams);
+            } catch {
+              params = null;
             }
+          } else if (rawParams && typeof rawParams === 'object') {
+            params = rawParams as { name?: string; volume?: number };
+          }
+
+          // Process audio event
+          if (event.event_type === 'stinger' && this.audio && params?.name) {
+            this.audio.playStinger(params.name as 'click' | 'heartbeat');
           }
         }
 

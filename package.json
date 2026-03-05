@@ -16,7 +16,7 @@
     "ui"
   ],
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "puppeteer": "^24.37.5"
   }
 }

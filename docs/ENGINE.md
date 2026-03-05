@@ -437,7 +437,7 @@ new oscillators     ──gain ramp→ target over CROSSFADE_TIME──►
 noise layer         ──replaced immediately, gain ramps in──►
 ```
 
-`CROSSFADE_TIME` is exported as a module constant (`2.0` seconds by default).
+`CROSSFADE_TIME` is defined internally as a module constant (`2.0` seconds by default).
 
 #### Integration Example
 

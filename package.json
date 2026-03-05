@@ -3,7 +3,6 @@
   "version": "4.0.0",
   "type": "module",
   "description": "Teotl V4 Nightmare Mode with psychological horror UI and atmospheric engine",
-  "type": "module",
   "main": "src/main.js",
   "scripts": {
     "start": "npx serve . -p 3000",

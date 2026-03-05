@@ -274,7 +274,6 @@ name = "teotl_engine"
 version = "4.0.0"
 dependencies = [
  "serde",
- "serde_json",
  "teotl_core",
 ]
 

@@ -23,7 +23,6 @@ export class WasmBridge {
 
       // Initialize the engine
       const engine = new this.wasmModule.TeotlWasm();
-      engine.init();
       (window as any).__teotl_engine__ = engine;
     } catch (e) {
       console.error('[WasmBridge] Failed to load WASM:', e);

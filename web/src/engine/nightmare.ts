@@ -96,6 +96,9 @@ export class NightmareEngine {
    * Manually set level (clamps to valid range).
    */
   setLevel(level: number): this {
+    if (!Number.isFinite(level)) {
+      level = NightmareLevel.DORMANT;
+    }
     const clamped = Math.max(NightmareLevel.DORMANT, Math.min(NightmareLevel.ABYSS, level));
     this._setLevel(clamped as NightmareLevelValue);
     return this;

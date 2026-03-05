@@ -100,11 +100,11 @@ mod tests {
         let drained = queue.drain();
         assert!(queue.is_empty());
         assert_eq!(drained.len(), 2);
-        matches!(drained[0], Event::Input(InputEvent::KeyDown { .. }));
-        matches!(
+        assert!(matches!(drained[0], Event::Input(InputEvent::KeyDown { .. })));
+        assert!(matches!(
             drained[1],
             Event::Gameplay(GameplayEvent::PlayerDamaged { .. })
-        );
+        ));
     }
 
     #[test]

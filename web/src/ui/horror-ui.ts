@@ -1,8 +1,37 @@
 /**
- * HorrorUI
+ * HorrorUI — TypeScript implementation
+ *
  * Manages the psychological-horror UI layer: glitch effects, corrupted text,
  * flickering elements, and atmosphere text injection.
  */
+
+const GLITCH_CHARS = '█▓▒░╫╪╬╩╦╣║═╔╗╚╝▄▀■□▪▫◄►▲▼±×÷∞∑∫∂≈≠';
+
+const ATMOSPHERE_LINES = [
+  'El vacío te observa.',
+  'No estás solo.',
+  'Algo se mueve en la oscuridad.',
+  'El ruido aumenta.',
+  'No puedes escapar.',
+  'Recuerda por qué viniste.',
+  'El sistema te conoce.',
+  'Tu presencia ha sido detectada.',
+  'La entidad se aproxima.',
+  'El tiempo no existe aquí.',
+  'Todo lo que ves es una trampa.',
+  'Respira. Si puedes.',
+];
+
+const NIGHTMARE_LINES = [
+  'NO HAY SALIDA.',
+  'TE VEO.',
+  'TEOTL TE CONSUME.',
+  '▓▓▓▓▓▓▓▓▓',
+  'ERROR: REALIDAD CORRUPTA',
+  'SISTEMA: MODO ABISMO ACTIVO',
+  'TU MENTE ES NUESTRA.',
+  '░░░CORRUPCIÓN TOTAL░░░',
+];
 
 export interface HorrorUIOptions {
   glitchIntensity?:    number;
@@ -12,9 +41,17 @@ export interface HorrorUIOptions {
 
 export class HorrorUI {
   private container: HTMLElement | null = null;
+  private atmosphereEl: HTMLElement | null = null;
+  private glitchOverlay: HTMLElement | null = null;
+
   private running = false;
+  private nightmareMode = false;
   private options: Required<HorrorUIOptions>;
   private glitchInterval: ReturnType<typeof setInterval> | null = null;
+
+  private atmoTimer: ReturnType<typeof setTimeout> | null = null;
+  private glitchTimer: ReturnType<typeof setTimeout> | null = null;
+  private activeTimers: Set<ReturnType<typeof setTimeout>> = new Set();
 
   constructor(options: HorrorUIOptions = {}) {
     this.options = {
@@ -27,110 +64,152 @@ export class HorrorUI {
   mount(container: HTMLElement): void {
     this.container = container;
 
-    // Add some initial scary UI
-    const title = document.createElement('h1');
-    title.className = 'horror-title glitch';
-    title.setAttribute('data-text', 'TEOTL V4');
-    title.textContent = 'TEOTL V4';
+    // 1. Atmosphere text element
+    this.atmosphereEl = document.createElement('div');
+    this.atmosphereEl.className = 'atmosphere-text';
+    this.container.appendChild(this.atmosphereEl);
 
-    const subtitle = document.createElement('p');
-    subtitle.className = 'horror-subtitle';
-    subtitle.textContent = 'NIGHTMARE MODE INITIALIZED...';
-
-    const engineStatus = document.createElement('div');
-    engineStatus.id = 'engine-status';
-    engineStatus.className = 'engine-status';
-    engineStatus.innerHTML = `
-      <p>Engine status: <span class="status-ok">ONLINE</span></p>
-      <p>Intensity: <span id="intensity-val">0.0</span></p>
-      <p>Nightmare Level: <span id="nightmare-val">CALM</span></p>
-    `;
-
-    const buttonGroup = document.createElement('div');
-    buttonGroup.className = 'button-group';
-
-    const increaseBtn = document.createElement('button');
-    increaseBtn.className = 'horror-btn';
-    increaseBtn.textContent = 'EMBRACE NIGHTMARE';
-    increaseBtn.onclick = () => {
-      const engine = (window as any).__teotl_engine__;
-      if (engine) {
-        const currentLevel = engine.get_nightmare_level();
-        if (currentLevel < 4) {
-          engine.set_nightmare_level(currentLevel + 1);
-          this.flashGlitch(0.8);
-          this.updateStatus();
-        }
-      }
-    };
-
-    const decreaseBtn = document.createElement('button');
-    decreaseBtn.className = 'horror-btn';
-    decreaseBtn.textContent = 'SEEK LIGHT';
-    decreaseBtn.onclick = () => {
-      const engine = (window as any).__teotl_engine__;
-      if (engine) {
-        const currentLevel = engine.get_nightmare_level();
-        if (currentLevel > 0) {
-          engine.set_nightmare_level(currentLevel - 1);
-          this.updateStatus();
-        }
-      }
-    };
-
-    buttonGroup.appendChild(decreaseBtn);
-    buttonGroup.appendChild(increaseBtn);
-
-    this.container.appendChild(title);
-    this.container.appendChild(subtitle);
-    this.container.appendChild(engineStatus);
-    this.container.appendChild(buttonGroup);
-
-    this.start();
-
-    // Update loop
-    setInterval(() => this.updateStatus(), 100);
-  }
-
-  updateStatus(): void {
-    const engine = (window as any).__teotl_engine__;
-    if (engine) {
-      engine.tick(0.016);
-      const intensityVal = document.getElementById('intensity-val');
-      const nightmareVal = document.getElementById('nightmare-val');
-
-      if (intensityVal) intensityVal.textContent = engine.get_intensity().toFixed(2);
-      if (nightmareVal) nightmareVal.textContent = engine.get_nightmare_name();
+    // 2. Glitch overlay (already exists in index.html, but let's be sure)
+    this.glitchOverlay = document.getElementById('glitch-overlay');
+    if (!this.glitchOverlay) {
+      this.glitchOverlay = document.createElement('div');
+      this.glitchOverlay.id = 'glitch-overlay';
+      this.glitchOverlay.className = 'glitch-overlay';
+      this.glitchOverlay.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(this.glitchOverlay);
     }
   }
 
   start(): void {
+    if (this.running) return;
     this.running = true;
-
-    if (this.options.glitchIntensity > 0) {
-      this.glitchInterval = setInterval(() => {
-        if (Math.random() < 0.1) {
-          this.flashGlitch(Math.random() * 0.5);
-        }
-      }, 2000);
-    }
+    this.scheduleAtmosphereText();
+    this.scheduleGlitch();
   }
 
   stop(): void {
     this.running = false;
-    if (this.glitchInterval) {
-      clearInterval(this.glitchInterval);
-      this.glitchInterval = null;
+    this.clearTimers();
+
+    if (this.glitchOverlay) {
+      this.glitchOverlay.classList.remove('active');
     }
+    document.body.classList.remove('nightmare-active');
   }
 
-  setNightmareMode(_active: boolean): void {
-    // TODO: escalate or calm visual effects
+  setNightmareMode(active: boolean): void {
+    this.nightmareMode = active;
+    document.body.classList.toggle('nightmare-active', active);
+    // You could also affect data-nightmare-level here if needed,
+    // but the original JS just toggled a class.
   }
 
   setOptions(patch: HorrorUIOptions): void {
     Object.assign(this.options, patch);
   }
+
+ horror-ui-implementation-10336436812407817428
+  /**
+   * Apply a brief screen-flash glitch effect.
+   */
+  flashGlitch(count = 1): void {
+    if (!this.glitchOverlay) return;
+
+    let i = 0;
+    const flash = () => {
+      if (!this.running || !this.glitchOverlay) return;
+
+      if (i >= count * 2) {
+        this.glitchOverlay.classList.remove('active');
+        return;
+      }
+
+      this.glitchOverlay.classList.toggle('active');
+      i++;
+
+      const delay = 40 + Math.random() * 80;
+      const t = setTimeout(() => {
+        this.activeTimers.delete(t);
+        flash();
+      }, delay);
+      this.activeTimers.add(t);
+    };
+
+    flash();
+  }
+
+  // ---- private ----
+
+  private scheduleAtmosphereText(): void {
+    if (!this.running) return;
+
+    const delay = this.nightmareMode
+      ? 1500 + Math.random() * 2000
+      : 4000 + Math.random() * 6000;
+
+    this.atmoTimer = setTimeout(() => {
+      this.updateAtmosphereText();
+      this.scheduleAtmosphereText();
+    }, delay);
+  }
+
+  private updateAtmosphereText(): void {
+    if (!this.atmosphereEl) return;
+
+    const lines = this.nightmareMode ? NIGHTMARE_LINES : ATMOSPHERE_LINES;
+    const text = lines[Math.floor(Math.random() * lines.length)];
+
+    if (this.options.corruptTextEnabled && this.nightmareMode) {
+      this.atmosphereEl.textContent = HorrorUI.corruptText(text, 0.15);
+    } else {
+      this.atmosphereEl.textContent = text;
+    }
+  }
+
+  private scheduleGlitch(): void {
+    if (!this.running) return;
+
+    const { glitchIntensity } = this.options;
+    const minDelay = this.nightmareMode ? 800  : 3000;
+    const maxDelay = this.nightmareMode ? 4000 : 15000;
+
+    // Higher intensity = lower factor = more frequent glitches
+    const factor = 1 + (10 - glitchIntensity) * 0.5;
+    const delay = (minDelay + Math.random() * (maxDelay - minDelay)) * factor;
+
+    this.glitchTimer = setTimeout(() => {
+      const flashCount = this.nightmareMode
+        ? 2 + Math.floor(Math.random() * 4)
+        : 1 + Math.floor(Math.random() * 2);
+
+      this.flashGlitch(flashCount);
+      this.scheduleGlitch();
+    }, delay);
+  }
+
+  private clearTimers(): void {
+    if (this.atmoTimer) {
+      clearTimeout(this.atmoTimer);
+      this.atmoTimer = null;
+    }
+    if (this.glitchTimer) {
+      clearTimeout(this.glitchTimer);
+      this.glitchTimer = null;
+    }
+    this.activeTimers.forEach(t => clearTimeout(t));
+    this.activeTimers.clear();
+  }
+
+  /**
+   * Corrupt a string by randomly replacing characters.
+   */
+  static corruptText(text: string, ratio = 0.15): string {
+    return text.split('').map(ch => {
+      if (ch === ' ') return ch;
+      return Math.random() < ratio
+        ? GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
+        : ch;
+    }).join('');
 
   flashGlitch(intensity: number): void {
     const overlay = document.getElementById('glitch-overlay');

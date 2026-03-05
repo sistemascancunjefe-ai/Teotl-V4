@@ -134,8 +134,8 @@ class TeotlApp {
     const atmOpts = this._nightmare.getAtmosphericOptions();
     this._atmospheric.setOptions(atmOpts);
 
-    // Audio
-    this._audio.setNightmareMode(level > 0);
+    // Audio — pass full level for per-level crossfade
+    this._audio.setNightmareLevel(level);
 
     // Horror UI
     this._horrorUI.setNightmareMode(level > 0);

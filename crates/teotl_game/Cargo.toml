@@ -1,11 +1,10 @@
 [package]
 name        = "teotl_game"
 description = "Game logic, world state, character systems, and quest engine for Teotl V4"
-version.workspace = true
-edition.workspace = true
-authors.workspace = true
-license.workspace = true
-repository.workspace = true
+version.workspace     = true
+edition.workspace     = true
+authors.workspace     = true
+license.workspace     = true
 
 [dependencies]
 teotl_core   = { path = "../teotl_core" }

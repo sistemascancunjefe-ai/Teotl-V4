@@ -38,8 +38,12 @@ jobs:
       - name: Create WASM mock
         run: |
           mkdir -p src/wasm
-          echo 'export default async function init() {}; export class TeotlWasm { init() {} }' > src/wasm/teotl_wasm.js
-          echo 'declare module "../wasm/teotl_wasm" { export default function init(): Promise<any>; export class TeotlWasm { init(): void; } }' > src/wasm/teotl_wasm.d.ts
+          if [ ! -f src/wasm/teotl_wasm.js ]; then
+            echo 'export default async function init() {}; export class TeotlWasm { init() {} }' > src/wasm/teotl_wasm.js
+          fi
+          if [ ! -f src/wasm/teotl_wasm.d.ts ]; then
+            echo 'declare module "../wasm/teotl_wasm" { export default function init(): Promise<any>; export class TeotlWasm { init(): void; } }' > src/wasm/teotl_wasm.d.ts
+          fi
 
       - name: Type-check
         run: npm run typecheck

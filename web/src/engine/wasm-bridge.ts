@@ -34,7 +34,6 @@ export class WasmBridge {
 
       // Create the engine instance
       this.wasm = new TeotlWasm();
-      this.wasm.init();
 
       console.info('[WasmBridge] WASM engine initialized successfully');
     } catch (error) {

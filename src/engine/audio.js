@@ -40,17 +40,14 @@ const STINGER_COOLDOWNS = {
 
 export class AudioEngine {
   constructor() {
-    this._ctx             = null;
-    this._masterGain      = null;
-    this._enabled         = false;
-    this._volume          = 0.6;
-    this._oscillators     = [];
-    this._noiseSource     = null;
-    this._noiseGainNode   = null;
-    /** @type {number} Current nightmare level (0–4). */
-    this._nightmareLevel  = 0;
-    /** @type {Map<string, number>} Last play timestamp (ms) per stinger type. */
-    this._stingerLastPlayed = new Map();
+    this._ctx         = null;
+    this._masterGain  = null;
+    this._enabled     = false;
+    this._volume      = 0.6;
+    this._oscillators = [];
+    this._noiseSource = null;
+    this._nightmareMode = false;
+    this._noiseBuffer = null;
   }
 
   /**
@@ -262,17 +259,19 @@ export class AudioEngine {
   _replaceNoiseLayer(config, now, rampTime) {
     if (!this._ctx) return;
 
-    this._stopNoiseSource();
+    // Reuse cached noise buffer if sampleRate matches
+    if (!this._noiseBuffer || this._noiseBuffer.sampleRate !== this._ctx.sampleRate) {
+      const bufferSize  = this._ctx.sampleRate * 2;
+      this._noiseBuffer = this._ctx.createBuffer(1, bufferSize, this._ctx.sampleRate);
+      const data        = this._noiseBuffer.getChannelData(0);
 
-    const bufferSize = this._ctx.sampleRate * 2;
-    const buffer     = this._ctx.createBuffer(1, bufferSize, this._ctx.sampleRate);
-    const data       = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * 0.5;
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * 0.5;
+      }
     }
 
     const source = this._ctx.createBufferSource();
-    source.buffer = buffer;
+    source.buffer = this._noiseBuffer;
     source.loop   = true;
 
     const filter = this._ctx.createBiquadFilter();

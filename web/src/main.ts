@@ -46,14 +46,13 @@ class TeotlApp {
     const glitchOverlay = document.getElementById('glitch-overlay');
     const screenMain = document.getElementById('screen-main');
 
-    if (atmosphereText && glitchOverlay && screenMain) {
-      this.horrorUI.mount({
-        atmosphereText,
-        glitchOverlay,
-        screen: screenMain,
-      });
+    if (screenMain) {
+      this.horrorUI.mount(screenMain as HTMLElement);
     }
 
+    
+      
+    
     // 4. Set up nightmare level change handlers
     this.nightmare.on('levelchange', (data) => {
       this.applyNightmareLevel(data.level, data.name);

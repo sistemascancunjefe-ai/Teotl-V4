@@ -8,7 +8,7 @@
   "scripts": {
     "start": "npx serve . -p 3000",
     "dev": "npx serve . -p 3000 --no-clipboard",
-    "test": "npx jest --testPathPattern=src/__tests__"
+    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest src/__tests__"
   },
   "keywords": [
     "horror",

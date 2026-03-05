@@ -56,7 +56,7 @@ export class AudioEngine {
   init() {
     if (this._ctx) return this;
     try {
-      this._ctx = new (window.AudioContext || window.webkitAudioContext)();
+      this._ctx = new window.AudioContext();
       this._masterGain = this._ctx.createGain();
       this._masterGain.gain.value = this._volume;
       this._masterGain.connect(this._ctx.destination);

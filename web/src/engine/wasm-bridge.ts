@@ -10,12 +10,12 @@ import init, { TeotlWasm } from '../wasm/teotl_wasm';
 
 export interface AudioEvent {
   event_type: string;
-  params: Record<string, unknown>;
+  params: string;
 }
 
 export interface RenderCommand {
   cmd_type: string;
-  params: Record<string, unknown>;
+  params: string;
 }
 
 export interface InputEvent {

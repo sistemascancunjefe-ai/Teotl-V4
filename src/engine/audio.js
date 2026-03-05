@@ -161,8 +161,22 @@ export class AudioEngine {
     const buffer      = this._ctx.createBuffer(1, bufferSize, this._ctx.sampleRate);
     const data        = buffer.getChannelData(0);
 
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * 0.5;
+    // Secure random noise generation using Web Crypto API in chunks
+    // (crypto.getRandomValues has a 65536 byte limit per call)
+    const chunkSize = 16384;
+    const randomValues = new Uint32Array(chunkSize);
+
+    for (let i = 0; i < bufferSize; i += chunkSize) {
+      const remaining = bufferSize - i;
+      const currentBatchSize = Math.min(chunkSize, remaining);
+      const batch = currentBatchSize === chunkSize ? randomValues : new Uint32Array(currentBatchSize);
+
+      crypto.getRandomValues(batch);
+
+      for (let j = 0; j < currentBatchSize; j++) {
+        // Map [0, 2^32-1] to [0, 1) then to [-0.5, 0.5)
+        data[i + j] = (batch[j] / 4294967296) - 0.5;
+      }
     }
 
     const source = this._ctx.createBufferSource();

@@ -1,13 +1,24 @@
 {
   "name": "teotl-v4",
   "version": "4.0.0",
+  "type": "module",
   "description": "Teotl V4 Nightmare Mode with psychological horror UI and atmospheric engine",
+  "type": "module",
   "main": "src/main.js",
   "scripts": {
     "start": "npx serve . -p 3000",
     "dev": "npx serve . -p 3000 --no-clipboard",
-    "test": "npx jest --testPathPattern=src/__tests__"
+    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest src/__tests__"
   },
-  "keywords": ["horror", "atmospheric", "nightmare", "game", "ui"],
-  "license": "MIT"
+  "keywords": [
+    "horror",
+    "atmospheric",
+    "nightmare",
+    "game",
+    "ui"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "puppeteer": "^24.37.5"
+  }
 }

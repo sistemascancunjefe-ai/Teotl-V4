@@ -134,14 +134,6 @@ export class WasmBridge {
   }
 
   /**
-   * Get nightmare level name
-   */
-  getNightmareName(): string {
-    if (!this.isReady() || !this.wasm) return 'DORMANT';
-    return this.wasm.get_nightmare_name();
-  }
-
-  /**
    * Get total tick count
    */
   getTickCount(): bigint {

@@ -89,17 +89,17 @@ Each phase has a goal, a checklist of deliverables, and a mapping to the [parall
 - [x] `README.md` created with project overview *(All agents)*
 - [x] `docs/AGENTS.md` — parallel agent roles defined *(All agents)*
 - [x] `docs/ROADMAP.md` — phased roadmap defined *(All agents)*
-- [ ] `crate/` — Cargo workspace scaffolded with `wasm-pack` *(Agent 1 — Engine Rust/WASM)*
-- [ ] `tsconfig.json` + build config (`vite.config.ts`) *(Agent 2 — Web Host TypeScript)*
-- [ ] `src/` directory structure finalised (`engine/`, `ui/`, `atmosphere/`, `host/`) *(Agents 1–4)*
-- [ ] `assets/` directory structure finalised with initial `manifest.json` *(Agent 5 — Content Pipeline)*
-- [ ] `docs/design/UI_HORROR_STATES.md` — UI horror state spec *(Agent 3 — Horror UI/UX)*
-- [ ] `docs/design/ATMOSPHERE_STATES.md` — atmosphere state spec *(Agent 4 — Atmospheric Engine)*
-- [ ] `docs/lore/WORLD_BIBLE.md` — initial world bible draft *(Agent 6 — Lore)*
-- [ ] `docs/art/ART_BIBLE.md` — initial art bible draft *(Agent 7 — Arte)*
-- [ ] WASM API contract documented (`crate/engine/README.md`) *(Agents 1 & 2)*
-- [ ] Asset manifest schema documented (`docs/ASSET_PIPELINE.md`) *(Agent 5)*
-- [ ] CI/CD pipeline configured (lint, build, test) *(Agent 2)*
+- [x] `crate/` — Cargo workspace scaffolded with `wasm-pack` *(Agent 1 — Engine Rust/WASM)*
+- [x] `tsconfig.json` + build config (`vite.config.ts`) *(Agent 2 — Web Host TypeScript)*
+- [x] `src/` directory structure finalised (`engine/`, `ui/`, `atmosphere/`, `host/`) *(Agents 1–4)*
+- [x] `assets/` directory structure finalised with initial `manifest.json` *(Agent 5 — Content Pipeline)*
+- [x] `docs/design/UI_HORROR_STATES.md` — UI horror state spec *(Agent 3 — Horror UI/UX)*
+- [x] `docs/design/ATMOSPHERE_STATES.md` — atmosphere state spec *(Agent 4 — Atmospheric Engine)*
+- [x] `docs/lore/WORLD_BIBLE.md` — initial world bible draft *(Agent 6 — Lore)*
+- [x] `docs/art/ART_BIBLE.md` — initial art bible draft *(Agent 7 — Arte)*
+- [x] WASM API contract documented (`crate/engine/README.md`) *(Agents 1 & 2)*
+- [x] Asset manifest schema documented (`docs/ASSET_PIPELINE.md`) *(Agent 5)*
+- [x] CI/CD pipeline configured (lint, build, test) *(Agent 2)*
 
 ---
 

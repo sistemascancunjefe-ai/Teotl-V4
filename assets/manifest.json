@@ -1,8 +1,12 @@
 {
   "version": "1.0.0",
   "sprites": {},
-  "audio": {},
+  "audio": {
+    "ambient_loop": "runtime/audio/ambient_loop.ogg"
+  },
   "levels": {},
-  "splasharts": {},
+  "splasharts": {
+    "splash_title": "runtime/splasharts/title.webp"
+  },
   "ui-icons": {}
 }

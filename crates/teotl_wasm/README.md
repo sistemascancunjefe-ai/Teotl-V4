@@ -12,7 +12,7 @@ The main export is the `TeotlWasm` class, which handles all communication betwee
 
 ### Lifecycle Methods
 
-- `constructor()`: Initializes the WASM environment, setting up the console panic hook.
+- `constructor()`: Sets up the Rust-side engine instance and installs the console panic hook. Note: WASM module initialisation must be performed first by calling and awaiting the generated `init()` function before constructing `TeotlWasm`.
 - `tick(dt: number)`: Advances the game simulation by `dt` seconds using a fixed timestep accumulator.
 
 ### Inputs
@@ -33,7 +33,7 @@ The main export is the `TeotlWasm` class, which handles all communication betwee
 ## Example
 
 ```typescript
-import init, { TeotlWasm } from './wasm/teotl_wasm.js';
+import init, { TeotlWasm } from '../../pkg/teotl_wasm.js';
 
 await init();
 const engine = new TeotlWasm();

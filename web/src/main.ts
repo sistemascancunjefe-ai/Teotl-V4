@@ -9,6 +9,7 @@ import { AudioEngine } from './engine/audio';
 import { NightmareEngine, NIGHTMARE_LEVEL_NAMES } from './engine/nightmare';
 import { WasmBridge } from './engine/wasm-bridge';
 import { HorrorUI } from './ui/horror-ui';
+import { WorldEngine, Location } from './engine/world';
 
 /** Main application class */
 class TeotlApp {
@@ -17,6 +18,7 @@ class TeotlApp {
   private nightmare: NightmareEngine | null = null;
   private horrorUI: HorrorUI | null = null;
   private wasm: WasmBridge | null = null;
+  private world: WorldEngine | null = null;
   private currentScreen: 'title' | 'main' | 'settings' = 'title';
 
   // Debug overlay
@@ -41,6 +43,10 @@ class TeotlApp {
     this.nightmare = new NightmareEngine({ escalationInterval: 30000 });
     this.horrorUI = new HorrorUI();
 
+    // Load World Engine
+    this.world = new WorldEngine();
+    await this.world.init();
+
     // 3. Mount horror UI
     const atmosphereText = document.getElementById('atmosphere-text');
     const glitchOverlay = document.getElementById('glitch-overlay');
@@ -50,9 +56,6 @@ class TeotlApp {
       this.horrorUI.mount(screenMain as HTMLElement);
     }
 
-    
-      
-    
     // 4. Set up nightmare level change handlers
     this.nightmare.on('levelchange', (data) => {
       this.applyNightmareLevel(data.level, data.name);
@@ -90,6 +93,7 @@ class TeotlApp {
         nightmare: this.nightmare,
         horrorUI: this.horrorUI,
         wasm: this.wasm,
+        world: this.world,
       };
     }
 
@@ -104,9 +108,59 @@ class TeotlApp {
 
     if (name === 'main') {
       this.horrorUI?.start();
+      this.renderCurrentLocation();
     } else {
       this.horrorUI?.stop();
     }
+  }
+
+  private renderCurrentLocation(): void {
+    if (!this.world) return;
+
+    const loc = this.world.getCurrentLocation();
+    if (!loc) return;
+
+    const titleEl = document.getElementById('level-title');
+    const descEl = document.getElementById('level-desc');
+    const navEl = document.getElementById('level-nav');
+
+    if (titleEl) {
+        titleEl.textContent = loc.name;
+        titleEl.setAttribute('data-text', loc.name); // For glitch effect
+    }
+    if (descEl) descEl.textContent = loc.description;
+
+    if (navEl) {
+        navEl.innerHTML = ''; // Clear previous navigation buttons
+
+        for (const connId of loc.connections) {
+            const connLoc = this.world.getLocation(connId);
+            if (connLoc) {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn';
+                btn.textContent = `AVANZAR A: ${connLoc.name}`;
+                btn.setAttribute('data-nav', connId);
+                btn.addEventListener('click', () => this.handleNavigation(connId));
+                navEl.appendChild(btn);
+            }
+        }
+    }
+  }
+
+  private handleNavigation(locationId: string): void {
+      if (!this.world) return;
+
+      const success = this.world.moveTo(locationId);
+      if (success) {
+          // Play a sound and flash glitch on transition
+          if (this.audio?.isInitialized()) {
+              this.audio.playStinger('click');
+          }
+          if (this.horrorUI) {
+              this.horrorUI.flashGlitch(2);
+          }
+          this.renderCurrentLocation();
+      }
   }
 
   private handleClick(e: MouseEvent): void {

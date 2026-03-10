@@ -18,17 +18,28 @@ export class AudioEngine {
   private masterGain: GainNode | null = null;
 
   init(): void {
-    if (this.ctx) return;
+    if (this.initialized) return;
+
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) {
+      console.error('Web Audio API not supported in this browser');
+      return;
+    }
 
     try {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      this.ctx = new AudioContextClass();
-      this.masterGain = this.ctx.createGain();
-      this.masterGain.gain.value = this.volume;
-      this.masterGain.connect(this.ctx.destination);
+      const ctx: AudioContext = new AudioContextClass();
+      const masterGain: GainNode = ctx.createGain();
+      masterGain.gain.value = this.volume;
+      masterGain.connect(ctx.destination);
+
+      this.ctx = ctx;
+      this.masterGain = masterGain;
       this.initialized = true;
     } catch (e) {
-      console.error('Web Audio API not supported', e);
+      console.error('Failed to create AudioContext', e);
+      this.ctx = null;
+      this.masterGain = null;
+      this.initialized = false;
     }
   }
 
@@ -44,7 +55,14 @@ export class AudioEngine {
   setVolume(volume: number): void {
     this.volume = Math.max(0, Math.min(1, volume));
     if (this.ctx && this.masterGain) {
-      this.masterGain.gain.setTargetAtTime(this.volume, this.ctx.currentTime, 0.1);
+      const gainParam = this.masterGain.gain;
+      const now = this.ctx.currentTime;
+      if (typeof (gainParam as any).cancelAndHoldAtTime === 'function') {
+        (gainParam as any).cancelAndHoldAtTime(now);
+      } else {
+        gainParam.cancelScheduledValues(now);
+      }
+      gainParam.setTargetAtTime(this.volume, now, 0.1);
     }
   }
 

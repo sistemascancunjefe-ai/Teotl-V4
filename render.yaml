@@ -1,0 +1,11 @@
+services:
+  - type: static
+    name: teotl-v4
+    env: static
+    buildCommand: ./render-build.sh
+    staticPublishPath: web/dist
+    headers:
+      - key: Cross-Origin-Opener-Policy
+        value: same-origin
+      - key: Cross-Origin-Embedder-Policy
+        value: require-corp

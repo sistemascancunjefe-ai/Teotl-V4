@@ -14,10 +14,22 @@ export class AudioEngine {
   private initialized = false;
   private enabled = true;
   private volume = 0.6;
+  private ctx: AudioContext | null = null;
+  private masterGain: GainNode | null = null;
 
   init(): void {
-    // TODO: create AudioContext and load audio buffers
-    this.initialized = true;
+    if (this.ctx) return;
+
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      this.ctx = new AudioContextClass();
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.value = this.volume;
+      this.masterGain.connect(this.ctx.destination);
+      this.initialized = true;
+    } catch (e) {
+      console.error('Web Audio API not supported', e);
+    }
   }
 
   isInitialized(): boolean {
@@ -31,7 +43,9 @@ export class AudioEngine {
 
   setVolume(volume: number): void {
     this.volume = Math.max(0, Math.min(1, volume));
-    // TODO: apply to master gain node
+    if (this.ctx && this.masterGain) {
+      this.masterGain.gain.setTargetAtTime(this.volume, this.ctx.currentTime, 0.1);
+    }
   }
 
   setNightmareMode(_active: boolean): void {

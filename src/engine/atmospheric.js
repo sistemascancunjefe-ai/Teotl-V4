@@ -112,13 +112,33 @@ export class AtmosphericEngine {
 
   _spawnFogLayers() {
     const { width, height } = this.canvas;
-    this._fogLayers = Array.from({ length: 5 }, (_, i) => ({
-      x:      Math.random() * width,
-      y:      Math.random() * height,
-      radius: width * 0.3 + i * width * 0.08,
-      speed:  (0.1 + Math.random() * 0.2) * (i % 2 === 0 ? 1 : -1),
-      phase:  Math.random() * Math.PI * 2,
-    }));
+    this._fogLayers = Array.from({ length: 5 }, (_, i) => {
+      const radius = width * 0.3 + i * width * 0.08;
+
+      // Pre-render fog gradient to an offscreen canvas
+      const offscreen = document.createElement('canvas');
+      const size = Math.ceil(radius * 2);
+      offscreen.width = size;
+      offscreen.height = size;
+
+      const octx = offscreen.getContext('2d');
+      const gradient = octx.createRadialGradient(radius, radius, 0, radius, radius, radius);
+      gradient.addColorStop(0,   'rgba(20, 0, 0, 1)');
+      gradient.addColorStop(0.5, 'rgba(10, 0, 0, 0.5)');
+      gradient.addColorStop(1,   'rgba(0, 0, 0, 0)');
+
+      octx.fillStyle = gradient;
+      octx.fillRect(0, 0, size, size);
+
+      return {
+        x:      Math.random() * width,
+        y:      Math.random() * height,
+        radius: radius,
+        speed:  (0.1 + Math.random() * 0.2) * (i % 2 === 0 ? 1 : -1),
+        phase:  Math.random() * Math.PI * 2,
+        canvas: offscreen,
+      };
+    });
   }
 
   /**
@@ -166,22 +186,18 @@ export class AtmosphericEngine {
   }
 
   _renderFog(time) {
-    const { ctx, canvas, options } = this;
-    const { width, height } = canvas;
+    const { ctx, options } = this;
     const fogAlpha = options.opacity * 0.04;
 
     ctx.save();
+    ctx.globalAlpha = fogAlpha;
+
     for (const layer of this._fogLayers) {
       const x = layer.x + Math.sin(time * 0.002 * options.fogSpeed + layer.phase) * 80;
       const y = layer.y + Math.cos(time * 0.001 * options.fogSpeed + layer.phase) * 40;
 
-      const gradient = ctx.createRadialGradient(x, y, 0, x, y, layer.radius);
-      gradient.addColorStop(0,   `rgba(20, 0, 0, ${fogAlpha})`);
-      gradient.addColorStop(0.5, `rgba(10, 0, 0, ${fogAlpha * 0.5})`);
-      gradient.addColorStop(1,   `rgba(0, 0, 0, 0)`);
-
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
+      // Use pre-rendered offscreen canvas for better performance
+      ctx.drawImage(layer.canvas, x - layer.radius, y - layer.radius);
     }
     ctx.restore();
   }

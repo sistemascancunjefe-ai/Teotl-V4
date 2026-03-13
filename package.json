@@ -9,9 +9,16 @@
     "dev": "npx serve . -p 3000 --no-clipboard",
     "test": "vitest run"
   },
-  "keywords": ["horror", "atmospheric", "nightmare", "game", "ui"],
+  "keywords": [
+    "horror",
+    "atmospheric",
+    "nightmare",
+    "game",
+    "ui"
+  ],
   "license": "MIT",
   "devDependencies": {
+    "@jest/globals": "^30.3.0",
     "vitest": "^1.6.0"
   }
 }

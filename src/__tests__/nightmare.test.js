@@ -1,5 +1,6 @@
 import { NightmareEngine } from '../engine/nightmare.js';
-import { jest } from '@jest/globals';
+import { vi } from 'vitest';
+const jest = vi;
 
 describe('NightmareEngine', () => {
   let engine;

@@ -20,7 +20,7 @@ export class AudioEngine {
   init(): void {
     if (this.initialized) return;
 
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if (!AudioContextClass) {
       console.error('Web Audio API not supported in this browser');
       return;
@@ -57,8 +57,8 @@ export class AudioEngine {
     if (this.ctx && this.masterGain) {
       const gainParam = this.masterGain.gain;
       const now = this.ctx.currentTime;
-      if (typeof (gainParam as any).cancelAndHoldAtTime === 'function') {
-        (gainParam as any).cancelAndHoldAtTime(now);
+      if (typeof gainParam.cancelAndHoldAtTime === 'function') {
+        gainParam.cancelAndHoldAtTime(now);
       } else {
         gainParam.cancelScheduledValues(now);
       }

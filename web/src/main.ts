@@ -20,6 +20,7 @@ class TeotlApp {
   private wasm: WasmBridge | null = null;
   private world: WorldEngine | null = null;
   private currentScreen: 'title' | 'main' | 'settings' = 'title';
+  private screens: NodeListOf<Element> | null = null;
 
   // Debug overlay
   private debugOverlay: HTMLDivElement | null = null;
@@ -55,6 +56,9 @@ class TeotlApp {
     if (screenMain) {
       this.horrorUI.mount(screenMain as HTMLElement);
     }
+
+    // Cache screens
+    this.screens = document.querySelectorAll('.screen');
 
     // 4. Set up nightmare level change handlers
     this.nightmare.on('levelchange', (data) => {
@@ -101,7 +105,8 @@ class TeotlApp {
   }
 
   private showScreen(name: 'title' | 'main' | 'settings'): void {
-    document.querySelectorAll('.screen').forEach(el => {
+    const screens = this.screens || document.querySelectorAll('.screen');
+    screens.forEach(el => {
       el.classList.toggle('screen--active', el.getAttribute('data-screen') === name);
     });
     this.currentScreen = name;

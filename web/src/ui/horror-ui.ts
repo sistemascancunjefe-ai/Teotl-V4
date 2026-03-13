@@ -126,7 +126,7 @@ export class HorrorUI {
       this.glitchOverlay.classList.toggle('active');
       i++;
 
-      const delay = 40 + Math.random() * 80;
+      const delay = 40 + HorrorUI._secureRandom() * 80;
       const t = setTimeout(() => {
         this.activeTimers.delete(t);
         flash();
@@ -143,8 +143,8 @@ export class HorrorUI {
     if (!this.running) return;
 
     const delay = this.nightmareMode
-      ? 1500 + Math.random() * 2000
-      : 4000 + Math.random() * 6000;
+      ? 1500 + HorrorUI._secureRandom() * 2000
+      : 4000 + HorrorUI._secureRandom() * 6000;
 
     this.atmoTimer = setTimeout(() => {
       this.updateAtmosphereText();
@@ -156,7 +156,7 @@ export class HorrorUI {
     if (!this.atmosphereEl) return;
 
     const lines = this.nightmareMode ? NIGHTMARE_LINES : ATMOSPHERE_LINES;
-    const text = lines[Math.floor(Math.random() * lines.length)];
+    const text = lines[Math.floor(HorrorUI._secureRandom() * lines.length)];
 
     if (this.options.corruptTextEnabled && this.nightmareMode) {
       this.atmosphereEl.textContent = HorrorUI.corruptText(text, 0.15);
@@ -174,12 +174,12 @@ export class HorrorUI {
 
     // Higher intensity = lower factor = more frequent glitches
     const factor = 1 + (10 - glitchIntensity) * 0.5;
-    const delay = (minDelay + Math.random() * (maxDelay - minDelay)) * factor;
+    const delay = (minDelay + HorrorUI._secureRandom() * (maxDelay - minDelay)) * factor;
 
     this.glitchTimer = setTimeout(() => {
       const flashCount = this.nightmareMode
-        ? 2 + Math.floor(Math.random() * 4)
-        : 1 + Math.floor(Math.random() * 2);
+        ? 2 + Math.floor(HorrorUI._secureRandom() * 4)
+        : 1 + Math.floor(HorrorUI._secureRandom() * 2);
 
       this.flashGlitch(flashCount);
       this.scheduleGlitch();
@@ -200,13 +200,23 @@ export class HorrorUI {
   }
 
   /**
+   * Cryptographically secure random replacement for Math.random().
+   * Returns a float between 0 (inclusive) and 1 (exclusive).
+   */
+  private static _secureRandom(): number {
+    const array = new Uint32Array(1);
+    window.crypto.getRandomValues(array);
+    return array[0] / (0xffffffff + 1);
+  }
+
+  /**
    * Corrupt a string by randomly replacing characters.
    */
   static corruptText(text: string, ratio = 0.15): string {
     return text.split('').map(ch => {
       if (ch === ' ') return ch;
-      return Math.random() < ratio
-        ? GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
+      return HorrorUI._secureRandom() < ratio
+        ? GLITCH_CHARS[Math.floor(HorrorUI._secureRandom() * GLITCH_CHARS.length)]
         : ch;
     }).join('');
   }

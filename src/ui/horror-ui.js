@@ -102,6 +102,17 @@ export class HorrorUI {
   }
 
   /**
+   * Cryptographically secure random replacement for Math.random().
+   * Returns a float between 0 (inclusive) and 1 (exclusive).
+   * @private
+   */
+  static _secureRandom() {
+    const array = new Uint32Array(1);
+    window.crypto.getRandomValues(array);
+    return array[0] / (0xffffffff + 1);
+  }
+
+  /**
    * Corrupt a string by randomly replacing characters.
    * @param {string} text
    * @param {number} ratio  0 – 1
@@ -110,8 +121,8 @@ export class HorrorUI {
   static corruptText(text, ratio = 0.15) {
     return text.split('').map(ch => {
       if (ch === ' ') return ch;
-      return Math.random() < ratio
-        ? GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
+      return HorrorUI._secureRandom() < ratio
+        ? GLITCH_CHARS[Math.floor(HorrorUI._secureRandom() * GLITCH_CHARS.length)]
         : ch;
     }).join('');
   }
@@ -130,7 +141,7 @@ export class HorrorUI {
       }
       this._glitchOverlay.classList.toggle('active');
       i++;
-      const t = setTimeout(flash, 40 + Math.random() * 80);
+      const t = setTimeout(flash, 40 + HorrorUI._secureRandom() * 80);
       this._timers.push(t);
     };
     flash();
@@ -141,8 +152,8 @@ export class HorrorUI {
   _scheduleAtmosphereText() {
     if (!this._atmoEl) return;
     const delay = this._nightmareMode
-      ? 1500 + Math.random() * 2000
-      : 4000  + Math.random() * 6000;
+      ? 1500 + HorrorUI._secureRandom() * 2000
+      : 4000  + HorrorUI._secureRandom() * 6000;
 
     this._atmoTimer = setTimeout(() => {
       this._updateAtmosphereText();
@@ -153,7 +164,7 @@ export class HorrorUI {
   _updateAtmosphereText() {
     if (!this._atmoEl) return;
     const lines = this._nightmareMode ? NIGHTMARE_LINES : ATMOSPHERE_LINES;
-    const text  = lines[Math.floor(Math.random() * lines.length)];
+    const text  = lines[Math.floor(HorrorUI._secureRandom() * lines.length)];
 
     if (this._options.corruptTextEnabled && this._nightmareMode) {
       this._atmoEl.textContent = HorrorUI.corruptText(text, 0.1);
@@ -167,12 +178,12 @@ export class HorrorUI {
     const minDelay = this._nightmareMode ? 800  : 3000;
     const maxDelay = this._nightmareMode ? 4000 : 15000;
     const factor   = 1 + (10 - glitchIntensity) * 0.5;
-    const delay    = (minDelay + Math.random() * (maxDelay - minDelay)) * factor;
+    const delay    = (minDelay + HorrorUI._secureRandom() * (maxDelay - minDelay)) * factor;
 
     this._glitchTimer = setTimeout(() => {
       const flashCount = this._nightmareMode
-        ? 2 + Math.floor(Math.random() * 4)
-        : 1 + Math.floor(Math.random() * 2);
+        ? 2 + Math.floor(HorrorUI._secureRandom() * 4)
+        : 1 + Math.floor(HorrorUI._secureRandom() * 2);
       this.flashGlitch(flashCount);
       this._scheduleGlitch();
     }, delay);

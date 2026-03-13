@@ -384,8 +384,7 @@ class TeotlApp {
           }
         }
 
-        // Process render commands from WASM (future use)
-        // const renderCommands = this.wasm.getRenderCommands();
+        // TODO: Process render commands from WASM
       }
 
       // Update debug overlay

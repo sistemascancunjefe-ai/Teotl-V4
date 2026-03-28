@@ -136,7 +136,7 @@ class TeotlApp {
     if (descEl) descEl.textContent = loc.description;
 
     if (navEl) {
-        navEl.innerHTML = ''; // Clear previous navigation buttons
+        navEl.textContent = ''; // Clear previous navigation buttons
 
         for (const connId of loc.connections) {
             const connLoc = this.world.getLocation(connId);

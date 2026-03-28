@@ -44,6 +44,7 @@ export class AudioEngine {
   private noiseGainNode: GainNode | null = null;
   private noiseBuffer: AudioBuffer | null = null;
   private nightmareLevel = 0;
+  private _randomUint32Buffer = new Uint32Array(16384);
 
   init(): void {
     if (this.initialized) return;
@@ -145,9 +146,7 @@ export class AudioEngine {
     const bufferSize = this.ctx.sampleRate * 0.6;
     const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
     const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = Math.random() * 2 - 1;
-    }
+    this._fillRandomNoise(data, 2.0);
 
     const source = this.ctx.createBufferSource();
     source.buffer = buffer;
@@ -318,18 +317,7 @@ export class AudioEngine {
       const bufferSize = this.ctx.sampleRate * 2;
       this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
       const data = this.noiseBuffer.getChannelData(0);
-
-      const chunkSize = 16384;
-      const randomValues = new Uint32Array(chunkSize);
-      for (let i = 0; i < bufferSize; i += chunkSize) {
-        const remaining = bufferSize - i;
-        const currentBatchSize = Math.min(chunkSize, remaining);
-        const batch = currentBatchSize === chunkSize ? randomValues : new Uint32Array(currentBatchSize);
-        crypto.getRandomValues(batch);
-        for (let j = 0; j < currentBatchSize; j++) {
-          data[i + j] = batch[j] / 4294967296 - 0.5;
-        }
-      }
+      this._fillRandomNoise(data, 1.0);
     }
 
     const source = this.ctx.createBufferSource();
@@ -351,5 +339,26 @@ export class AudioEngine {
 
     this.noiseSource = source;
     this.noiseGainNode = gain;
+  }
+
+  /**
+   * Secure random noise generation using Web Crypto API.
+   * Centralizes buffer generation and avoids Math.random().
+   */
+  private _fillRandomNoise(data: Float32Array, range: number): void {
+    const bufferSize = data.length;
+    const chunkSize = this._randomUint32Buffer.length;
+
+    for (let i = 0; i < bufferSize; i += chunkSize) {
+      const remaining = bufferSize - i;
+      const currentBatchSize = Math.min(chunkSize, remaining);
+      const batch = currentBatchSize === chunkSize ? this._randomUint32Buffer : new Uint32Array(currentBatchSize);
+      crypto.getRandomValues(batch);
+
+      for (let j = 0; j < currentBatchSize; j++) {
+        // Map [0, 2^32-1] to [-range/2, range/2]
+        data[i + j] = (batch[j] / 4294967296) * range - (range / 2);
+      }
+    }
   }
 }

@@ -48,6 +48,7 @@ export class AudioEngine {
     this._noiseSource = null;
     this._nightmareMode = false;
     this._noiseBuffer = null;
+    this._randomUint32Buffer = new Uint32Array(16384);
   }
 
   /**
@@ -259,24 +260,11 @@ export class AudioEngine {
   _replaceNoiseLayer(config, now, rampTime) {
     if (!this._ctx) return;
 
-    // Secure random noise generation using Web Crypto API in chunks
-    // (crypto.getRandomValues has a 65536 byte limit per call)
     if (!this._noiseBuffer || this._noiseBuffer.sampleRate !== this._ctx.sampleRate) {
       const bufferSize = this._ctx.sampleRate * 2; // 2 seconds of noise
       this._noiseBuffer = this._ctx.createBuffer(1, bufferSize, this._ctx.sampleRate);
       const data = this._noiseBuffer.getChannelData(0);
-
-      const chunkSize = 16384;
-      const randomValues = new Uint32Array(chunkSize);
-      for (let i = 0; i < bufferSize; i += chunkSize) {
-        const remaining = bufferSize - i;
-        const currentBatchSize = Math.min(chunkSize, remaining);
-        const batch = currentBatchSize === chunkSize ? randomValues : new Uint32Array(currentBatchSize);
-        crypto.getRandomValues(batch);
-        for (let j = 0; j < currentBatchSize; j++) {
-          data[i + j] = (batch[j] / 4294967296) - 0.5;
-        }
-      }
+      this._fillRandomNoise(data, 1.0);
     }
 
     const source = this._ctx.createBufferSource();
@@ -343,9 +331,7 @@ export class AudioEngine {
     const bufferSize = this._ctx.sampleRate * 0.6;
     const buffer     = this._ctx.createBuffer(1, bufferSize, this._ctx.sampleRate);
     const data       = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1);
-    }
+    this._fillRandomNoise(data, 2.0);
 
     const source = this._ctx.createBufferSource();
     source.buffer = buffer;
@@ -384,5 +370,26 @@ export class AudioEngine {
     gain.connect(this._masterGain);
     osc.start(now);
     osc.stop(now + 0.5);
+  }
+
+  /**
+   * Secure random noise generation using Web Crypto API.
+   * Centralizes buffer generation and avoids Math.random().
+   */
+  _fillRandomNoise(data, range) {
+    const bufferSize = data.length;
+    const chunkSize = this._randomUint32Buffer.length;
+
+    for (let i = 0; i < bufferSize; i += chunkSize) {
+      const remaining = bufferSize - i;
+      const currentBatchSize = Math.min(chunkSize, remaining);
+      const batch = currentBatchSize === chunkSize ? this._randomUint32Buffer : new Uint32Array(currentBatchSize);
+      crypto.getRandomValues(batch);
+
+      for (let j = 0; j < currentBatchSize; j++) {
+        // Map [0, 2^32-1] to [-range/2, range/2]
+        data[i + j] = (batch[j] / 4294967296) * range - (range / 2);
+      }
+    }
   }
 }

@@ -48,6 +48,7 @@ export class AudioEngine {
     this._noiseSource = null;
     this._nightmareMode = false;
     this._noiseBuffer = null;
+    this._stingerLastPlayed = new Map();
   }
 
   /**
@@ -171,6 +172,29 @@ export class AudioEngine {
   }
 
   /**
+   * Internal helper to create, connect, and start an oscillator/gain pair.
+   * @param {'sine'|'square'|'sawtooth'|'triangle'} type
+   * @param {number|null} freq
+   * @param {number} startTime
+   * @returns {{osc: OscillatorNode, gain: GainNode}}
+   */
+  _createVoice(type, freq, startTime) {
+    const osc  = this._ctx.createOscillator();
+    const gain = this._ctx.createGain();
+
+    osc.type = type;
+    if (freq !== null) {
+      osc.frequency.value = freq;
+    }
+
+    osc.connect(gain);
+    gain.connect(this._masterGain);
+    osc.start(startTime);
+
+    return { osc, gain };
+  }
+
+  /**
    * Crossfade from the current ambient layer to the one matching
    * `_nightmareLevel`.  Running oscillators are faded out and replaced
    * by fresh ones targeting the new config.
@@ -210,17 +234,9 @@ export class AudioEngine {
     const config = AMBIENT_CONFIGS[this._nightmareLevel];
 
     for (const freq of config.droneFreqs) {
-      const osc  = this._ctx.createOscillator();
-      const gain = this._ctx.createGain();
-
-      osc.type            = 'sawtooth';
-      osc.frequency.value = freq;
+      const { osc, gain } = this._createVoice('sawtooth', freq, now);
       gain.gain.setValueAtTime(0, now);
       gain.gain.linearRampToValueAtTime(config.droneGain, now + rampTime);
-
-      osc.connect(gain);
-      gain.connect(this._masterGain);
-      osc.start(now);
       this._oscillators.push({ osc, gain });
     }
 
@@ -302,18 +318,11 @@ export class AudioEngine {
 
   _playClick() {
     if (!this._ctx) return;
-    const now  = this._ctx.currentTime;
-    const osc  = this._ctx.createOscillator();
-    const gain = this._ctx.createGain();
+    const now = this._ctx.currentTime;
+    const { osc, gain } = this._createVoice('sine', 80, now);
 
-    osc.frequency.value = 80;
-    osc.type            = 'sine';
     gain.gain.setValueAtTime(0.15, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
-
-    osc.connect(gain);
-    gain.connect(this._masterGain);
-    osc.start(now);
     osc.stop(now + 0.15);
   }
 
@@ -322,16 +331,10 @@ export class AudioEngine {
     const now = this._ctx.currentTime;
 
     for (const offset of [0, 0.2]) {
-      const osc  = this._ctx.createOscillator();
-      const gain = this._ctx.createGain();
-      osc.frequency.value = 50;
-      osc.type            = 'sine';
+      const { osc, gain } = this._createVoice('sine', 50, now + offset);
       gain.gain.setValueAtTime(0, now + offset);
       gain.gain.linearRampToValueAtTime(0.3, now + offset + 0.05);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.3);
-      osc.connect(gain);
-      gain.connect(this._masterGain);
-      osc.start(now + offset);
       osc.stop(now + offset + 0.4);
     }
   }
@@ -369,20 +372,14 @@ export class AudioEngine {
   /** Short high-pitched screech — reserved for TERROR / ABYSS. */
   _playScreech() {
     if (!this._ctx) return;
-    const now  = this._ctx.currentTime;
-    const osc  = this._ctx.createOscillator();
-    const gain = this._ctx.createGain();
+    const now = this._ctx.currentTime;
+    const { osc, gain } = this._createVoice('sawtooth', null, now);
 
-    osc.type = 'sawtooth';
     osc.frequency.setValueAtTime(800, now);
     osc.frequency.exponentialRampToValueAtTime(200, now + 0.4);
 
     gain.gain.setValueAtTime(0.18, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
-
-    osc.connect(gain);
-    gain.connect(this._masterGain);
-    osc.start(now);
     osc.stop(now + 0.5);
   }
 }

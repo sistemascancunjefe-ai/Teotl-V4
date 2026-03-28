@@ -119,12 +119,16 @@ export class HorrorUI {
    * @returns {string}
    */
   static corruptText(text, ratio = 0.15) {
-    return text.split('').map(ch => {
-      if (ch === ' ') return ch;
-      return HorrorUI._secureRandom() < ratio
-        ? GLITCH_CHARS[Math.floor(HorrorUI._secureRandom() * GLITCH_CHARS.length)]
-        : ch;
-    }).join('');
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (ch === ' ' || HorrorUI._secureRandom() >= ratio) {
+        result += ch;
+      } else {
+        result += GLITCH_CHARS[Math.floor(HorrorUI._secureRandom() * GLITCH_CHARS.length)];
+      }
+    }
+    return result;
   }
 
   /**

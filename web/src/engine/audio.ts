@@ -44,6 +44,7 @@ export class AudioEngine {
   private noiseGainNode: GainNode | null = null;
   private noiseBuffer: AudioBuffer | null = null;
   private nightmareLevel = 0;
+  private _randomUint32Buffer = new Uint32Array(16384);
 
   init(): void {
     if (this.initialized) return;
@@ -144,10 +145,7 @@ export class AudioEngine {
     const now = this.ctx.currentTime;
     const bufferSize = this.ctx.sampleRate * 0.6;
     const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = Math.random() * 2 - 1;
-    }
+    this._fillRandomNoise(buffer.getChannelData(0));
 
     const source = this.ctx.createBufferSource();
     source.buffer = buffer;
@@ -317,19 +315,8 @@ export class AudioEngine {
     if (!this.noiseBuffer || this.noiseBuffer.sampleRate !== this.ctx.sampleRate) {
       const bufferSize = this.ctx.sampleRate * 2;
       this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-      const data = this.noiseBuffer.getChannelData(0);
-
-      const chunkSize = 16384;
-      const randomValues = new Uint32Array(chunkSize);
-      for (let i = 0; i < bufferSize; i += chunkSize) {
-        const remaining = bufferSize - i;
-        const currentBatchSize = Math.min(chunkSize, remaining);
-        const batch = currentBatchSize === chunkSize ? randomValues : new Uint32Array(currentBatchSize);
-        crypto.getRandomValues(batch);
-        for (let j = 0; j < currentBatchSize; j++) {
-          data[i + j] = batch[j] / 4294967296 - 0.5;
-        }
-      }
+      // Ambient noise uses [-0.5, 0.5] range in original implementation
+      this._fillRandomNoise(this.noiseBuffer.getChannelData(0), 1.0);
     }
 
     const source = this.ctx.createBufferSource();
@@ -351,5 +338,32 @@ export class AudioEngine {
 
     this.noiseSource = source;
     this.noiseGainNode = gain;
+  }
+
+  /**
+   * Fills a Float32Array with random noise using the cryptographically
+   * secure Web Crypto API in bulk.
+   * @param data The buffer to fill.
+   * @param range The total range of the noise (default 2.0 for [-1.0, 1.0]).
+   */
+  private _fillRandomNoise(data: Float32Array, range: number = 2.0): void {
+    const size = data.length;
+    const chunkSize = this._randomUint32Buffer.length;
+    const multiplier = range / 4294967296;
+    const offset = range / 2;
+
+    for (let i = 0; i < size; i += chunkSize) {
+      const remaining = size - i;
+      const currentBatchSize = Math.min(chunkSize, remaining);
+      const batch = currentBatchSize === chunkSize
+        ? this._randomUint32Buffer
+        : new Uint32Array(currentBatchSize);
+
+      crypto.getRandomValues(batch);
+
+      for (let j = 0; j < currentBatchSize; j++) {
+        data[i + j] = batch[j] * multiplier - offset;
+      }
+    }
   }
 }

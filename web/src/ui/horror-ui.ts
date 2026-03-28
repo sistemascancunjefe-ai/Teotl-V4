@@ -199,25 +199,38 @@ export class HorrorUI {
     this.activeTimers.clear();
   }
 
+  private static _randomPool: Uint32Array = new Uint32Array(256);
+  private static _poolIndex: number = 256;
+
   /**
    * Cryptographically secure random replacement for Math.random().
    * Returns a float between 0 (inclusive) and 1 (exclusive).
+   * Optimized with a pool to reduce getRandomValues calls and allocations.
    */
   private static _secureRandom(): number {
-    const array = new Uint32Array(1);
-    window.crypto.getRandomValues(array);
-    return array[0] / (0xffffffff + 1);
+    if (HorrorUI._poolIndex >= HorrorUI._randomPool.length) {
+      window.crypto.getRandomValues(HorrorUI._randomPool);
+      HorrorUI._poolIndex = 0;
+    }
+    return HorrorUI._randomPool[HorrorUI._poolIndex++] / (0xffffffff + 1);
   }
 
   /**
    * Corrupt a string by randomly replacing characters.
    */
   static corruptText(text: string, ratio = 0.15): string {
-    return text.split('').map(ch => {
-      if (ch === ' ') return ch;
-      return HorrorUI._secureRandom() < ratio
-        ? GLITCH_CHARS[Math.floor(HorrorUI._secureRandom() * GLITCH_CHARS.length)]
-        : ch;
-    }).join('');
+    let result = '';
+    const len = text.length;
+    for (let i = 0; i < len; i++) {
+      const ch = text[i];
+      if (ch === ' ') {
+        result += ch;
+      } else if (HorrorUI._secureRandom() < ratio) {
+        result += GLITCH_CHARS[Math.floor(HorrorUI._secureRandom() * GLITCH_CHARS.length)];
+      } else {
+        result += ch;
+      }
+    }
+    return result;
   }
 }

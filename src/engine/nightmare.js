@@ -4,7 +4,7 @@
  */
 
 /** Intensity levels mapped to descriptive states. */
-export const NightmareLevel = Object.freeze({
+const NightmareLevel = Object.freeze({
   DORMANT:   0,
   AWAKENING: 1,
   DREAD:     2,

@@ -16,12 +16,13 @@ export interface WorldData {
 export class WorldEngine {
     private locations: Map<string, Location> = new Map();
     private currentLocationId: string | null = null;
+    public yamlParser = YAML;
 
     constructor() {}
 
     async init(): Promise<void> {
         try {
-            const data: WorldData = YAML.parse(locationsRaw);
+            const data: WorldData = this.yamlParser.parse(locationsRaw);
             for (const loc of data.locations) {
                 this.locations.set(loc.id, loc);
             }

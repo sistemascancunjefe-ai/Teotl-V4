@@ -40,7 +40,7 @@ export class NightmareEngine {
   private _active = false;
   private _escalationInterval: number;
   private _escalationTimer: ReturnType<typeof setTimeout> | null = null;
-  private _listeners: Record<string, Array<(data: unknown) => void>> = {};
+  private _listeners: Record<string, Set<(data: unknown) => void>> = {};
 
   /**
    * @param options.escalationInterval - ms between auto-escalations (default: 20000)
@@ -108,8 +108,8 @@ export class NightmareEngine {
    * Register an event listener.
    */
   on<K extends NightmareEventName>(event: K, fn: (data: NightmareEventMap[K]) => void): this {
-    if (!this._listeners[event]) this._listeners[event] = [];
-    this._listeners[event].push(fn as (data: unknown) => void);
+    if (!this._listeners[event]) this._listeners[event] = new Set();
+    this._listeners[event].add(fn as (data: unknown) => void);
     return this;
   }
 
@@ -118,7 +118,7 @@ export class NightmareEngine {
    */
   off<K extends NightmareEventName>(event: K, fn: (data: NightmareEventMap[K]) => void): this {
     if (!this._listeners[event]) return this;
-    this._listeners[event] = this._listeners[event].filter(f => f !== fn);
+    this._listeners[event].delete(fn as (data: unknown) => void);
     return this;
   }
 

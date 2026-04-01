@@ -24,6 +24,7 @@ class TeotlApp {
 
   // Debug overlay
   private debugOverlay: HTMLDivElement | null = null;
+  private debugFields: Record<string, HTMLElement> = {};
   private lastFrameTime = 0;
   private fps = 0;
   private dt = 0;
@@ -136,7 +137,7 @@ class TeotlApp {
     if (descEl) descEl.textContent = loc.description;
 
     if (navEl) {
-        navEl.innerHTML = ''; // Clear previous navigation buttons
+        navEl.textContent = ''; // Clear previous navigation buttons
 
         for (const connId of loc.connections) {
             const connLoc = this.world.getLocation(connId);
@@ -321,6 +322,32 @@ class TeotlApp {
       z-index: 10000;
       min-width: 200px;
     `;
+
+    const title = document.createElement('div');
+    const titleStrong = document.createElement('strong');
+    titleStrong.textContent = 'TEOTL V4 DEBUG';
+    title.appendChild(titleStrong);
+    this.debugOverlay.appendChild(title);
+
+    const fields = [
+      { key: 'fps', label: 'FPS: ' },
+      { key: 'dt', label: 'dt: ' },
+      { key: 'tension', label: 'Tension: ' },
+      { key: 'nightmare', label: 'Nightmare: ' },
+      { key: 'wasmLevel', label: 'WASM Level: ' },
+      { key: 'wasmTime', label: 'WASM Time: ' },
+      { key: 'screen', label: 'Screen: ' },
+    ];
+
+    for (const { key, label } of fields) {
+      const container = document.createElement('div');
+      container.textContent = label;
+      const span = document.createElement('span');
+      this.debugFields[key] = span;
+      container.appendChild(span);
+      this.debugOverlay.appendChild(container);
+    }
+
     document.body.appendChild(this.debugOverlay);
   }
 
@@ -332,16 +359,13 @@ class TeotlApp {
     const wasmLevel = this.wasm?.getNightmareLevel() ?? 0;
     const wasmTime = this.wasm?.getTotalTime() ?? 0;
 
-    this.debugOverlay.innerHTML = `
-      <div><strong>TEOTL V4 DEBUG</strong></div>
-      <div>FPS: ${this.fps}</div>
-      <div>dt: ${this.dt.toFixed(3)}s</div>
-      <div>Tension: ${tension}</div>
-      <div>Nightmare: ${this.nightmare?.levelName ?? 'N/A'} (${this.nightmare?.level ?? 0})</div>
-      <div>WASM Level: ${wasmLevel}</div>
-      <div>WASM Time: ${wasmTime.toFixed(1)}s</div>
-      <div>Screen: ${this.currentScreen}</div>
-    `;
+    if (this.debugFields.fps) this.debugFields.fps.textContent = String(this.fps);
+    if (this.debugFields.dt) this.debugFields.dt.textContent = `${this.dt.toFixed(3)}s`;
+    if (this.debugFields.tension) this.debugFields.tension.textContent = tension;
+    if (this.debugFields.nightmare) this.debugFields.nightmare.textContent = `${this.nightmare?.levelName ?? 'N/A'} (${this.nightmare?.level ?? 0})`;
+    if (this.debugFields.wasmLevel) this.debugFields.wasmLevel.textContent = String(wasmLevel);
+    if (this.debugFields.wasmTime) this.debugFields.wasmTime.textContent = `${wasmTime.toFixed(1)}s`;
+    if (this.debugFields.screen) this.debugFields.screen.textContent = this.currentScreen;
   }
 
   private startGameLoop(): void {

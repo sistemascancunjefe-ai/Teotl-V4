@@ -29,7 +29,6 @@ export class WorldEngine {
                 // Set initial location to the first one in the list (usually liminal_entrance)
                 this.currentLocationId = data.locations[0].id;
             }
-            console.log('[WorldEngine] Successfully loaded world data. Current location:', this.currentLocationId);
         } catch (error) {
             console.error('[WorldEngine] Failed to load world data:', error);
             throw error;

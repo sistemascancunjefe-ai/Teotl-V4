@@ -10,6 +10,13 @@
 
 export type StingerName = 'click' | 'heartbeat' | 'whisper' | 'scream';
 
+interface AmbientConfig {
+  droneFreqs: number[];
+  droneGain: number;
+  noiseGain: number;
+  filterFreq: number;
+}
+
 const STINGER_COOLDOWNS: Record<string, number> = {
   click: 500,
   heartbeat: 3000,
@@ -17,7 +24,7 @@ const STINGER_COOLDOWNS: Record<string, number> = {
   scream: 15000,
 };
 
-const AMBIENT_CONFIGS = [
+const AMBIENT_CONFIGS: AmbientConfig[] = [
   // 0 DORMANT
   { droneFreqs: [27.5, 41.2],                       droneGain: 0.015, noiseGain: 0.008, filterFreq: 80  },
   // 1 AWAKENING
@@ -311,7 +318,7 @@ export class AudioEngine {
     this.noiseGainNode = null;
   }
 
-  private _replaceNoiseLayer(config: any, now: number, rampTime: number): void {
+  private _replaceNoiseLayer(config: AmbientConfig, now: number, rampTime: number): void {
     if (!this.ctx || !this.masterGain) return;
 
     if (!this.noiseBuffer || this.noiseBuffer.sampleRate !== this.ctx.sampleRate) {

@@ -29,6 +29,19 @@ describe('HorrorUI', () => {
       }
     };
 
+    if (typeof global.window === 'undefined') {
+      global.window = {
+        crypto: {
+          getRandomValues: (array) => {
+            for (let i = 0; i < array.length; i++) {
+              array[i] = Math.floor(Math.random() * 0xffffffff);
+            }
+            return array;
+          }
+        }
+      };
+    }
+
     spyOn(global.document.body.classList, 'toggle');
 
     ui = new HorrorUI();
